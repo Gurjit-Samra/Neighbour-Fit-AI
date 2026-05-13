@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "hello": "tsx ./src/hello.ts",
+    "seed": "tsx ./src/seed.ts",
+    "seed-csv": "tsx ./src/seed-csv.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
@@ -13,6 +15,8 @@
     "tsx": "catalog:"
   },
   "dependencies": {
-    "bcrypt": "^6.0.0"
+    "@workspace/db": "workspace:*",
+    "bcrypt": "^6.0.0",
+    "drizzle-orm": "catalog:"
   }
 }
