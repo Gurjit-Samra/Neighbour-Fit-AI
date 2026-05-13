@@ -602,16 +602,16 @@ export default function Results() {
                   </div>
                 )}
 
-                {/* AI narrative */}
+                {/* Lifestyle insight */}
                 {selected?.aiSummary && !selected?.aiSummaryError && (
                   <div className="px-5 py-4 border-b border-slate-700">
                     <div className="bg-gradient-to-br from-slate-700/50 to-slate-600/30 border border-slate-600 rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Sparkles className="h-4 w-4 text-teal-400" />
-                        <h3 className="text-sm font-semibold text-slate-100">AI Lifestyle Fit Analysis</h3>
+                        <h3 className="text-sm font-semibold text-slate-100">Lifestyle insight</h3>
                       </div>
                       <p className="text-sm text-slate-300 leading-relaxed">{selected.aiSummary}</p>
-                      <p className="text-[10px] text-slate-500 mt-2">Scores are curated MVP estimates, not AI-generated.</p>
+                      <p className="text-[10px] text-slate-500 mt-2">Scores are curated estimates, not AI-generated.</p>
                     </div>
                   </div>
                 )}

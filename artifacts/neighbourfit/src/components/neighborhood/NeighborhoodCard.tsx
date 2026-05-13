@@ -119,14 +119,14 @@ export function NeighborhoodCard({
         {aiSummary && (
           <div className="bg-accent/40 rounded-xl p-3.5 mb-4 text-sm leading-relaxed border border-accent">
             <p className="text-xs font-semibold text-muted-foreground mb-1.5 flex items-center gap-1">
-              <span>✨</span> AI-generated insight
+              <span>✨</span> Lifestyle insight
             </p>
             <p className="text-foreground">{aiSummary}</p>
           </div>
         )}
         {aiSummaryError && (
           <div className="bg-muted rounded-lg p-3 mb-4 text-xs text-muted-foreground italic">
-            AI summary unavailable for this match.
+            Lifestyle insight unavailable for this match.
           </div>
         )}
 
