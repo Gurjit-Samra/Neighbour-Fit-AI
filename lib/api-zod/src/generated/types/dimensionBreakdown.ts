@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface DimensionBreakdown {
+  dimension: string;
+  score: number;
+  weight: number;
+  contribution: number;
 }

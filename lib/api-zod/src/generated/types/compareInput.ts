@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface CompareInput {
+  /**
+   * @minItems 2
+   * @maxItems 3
+   */
+  slugs: string[];
 }

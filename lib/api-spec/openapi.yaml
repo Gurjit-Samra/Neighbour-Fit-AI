@@ -3,13 +3,26 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: NeighbourFit AI API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: neighborhoods
+    description: Neighborhood data
+  - name: recommendations
+    description: Recommendation sessions
+  - name: favorites
+    description: User favorites
+  - name: comparison
+    description: Neighborhood comparison
+  - name: admin
+    description: Admin operations
+
 paths:
   /healthz:
     get:
@@ -24,6 +37,386 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # Auth
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Neighborhoods
+  /neighborhoods:
+    get:
+      operationId: listNeighborhoods
+      tags: [neighborhoods]
+      summary: List all neighborhoods
+      responses:
+        "200":
+          description: List of neighborhoods
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Neighborhood"
+
+  /neighborhoods/{slug}:
+    get:
+      operationId: getNeighborhood
+      tags: [neighborhoods]
+      summary: Get neighborhood by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Neighborhood detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NeighborhoodDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Recommendations
+  /recommendations:
+    post:
+      operationId: createRecommendation
+      tags: [recommendations]
+      summary: Generate neighborhood recommendations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionnaireInput"
+      responses:
+        "200":
+          description: Recommendation results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecommendationResult"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /recommendations/history:
+    get:
+      operationId: getRecommendationHistory
+      tags: [recommendations]
+      summary: Get recommendation history for current user
+      responses:
+        "200":
+          description: List of past recommendation sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RecommendationSession"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /recommendations/{id}:
+    get:
+      operationId: getRecommendation
+      tags: [recommendations]
+      summary: Get a specific recommendation session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Recommendation session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecommendationResult"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Favorites
+  /favorites:
+    get:
+      operationId: listFavorites
+      tags: [favorites]
+      summary: Get user's favorite neighborhoods
+      responses:
+        "200":
+          description: List of favorite neighborhoods
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Neighborhood"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /favorites/{neighborhoodId}:
+    post:
+      operationId: addFavorite
+      tags: [favorites]
+      summary: Save a neighborhood as favorite
+      parameters:
+        - name: neighborhoodId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Favorite saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: removeFavorite
+      tags: [favorites]
+      summary: Remove a neighborhood from favorites
+      parameters:
+        - name: neighborhoodId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Favorite removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Comparison
+  /compare:
+    post:
+      operationId: compareNeighborhoods
+      tags: [comparison]
+      summary: Compare 2-3 neighborhoods
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompareInput"
+      responses:
+        "200":
+          description: Comparison result
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NeighborhoodComparison"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Admin
+  /admin/neighborhoods:
+    get:
+      operationId: adminListNeighborhoods
+      tags: [admin]
+      summary: Admin list all neighborhoods with full data
+      responses:
+        "200":
+          description: All neighborhoods
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NeighborhoodAdmin"
+
+  /admin/neighborhoods/{id}:
+    patch:
+      operationId: adminUpdateNeighborhood
+      tags: [admin]
+      summary: Update neighborhood data
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NeighborhoodUpdate"
+      responses:
+        "200":
+          description: Updated neighborhood
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NeighborhoodAdmin"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/neighborhoods/{id}/invalidate-cache:
+    post:
+      operationId: adminInvalidateCache
+      tags: [admin]
+      summary: Invalidate AI summary cache for a neighborhood
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Cache invalidated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /admin/analytics:
+    get:
+      operationId: adminGetAnalytics
+      tags: [admin]
+      summary: Get analytics data
+      responses:
+        "200":
+          description: Analytics summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Analytics"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +427,529 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        role:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - email
+        - role
+        - createdAt
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        message:
+          type: string
+      required:
+        - user
+
+    RegisterInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+      required:
+        - email
+        - password
+
+    LoginInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    Neighborhood:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        city:
+          type: string
+        identity:
+          type: string
+        description:
+          type: ["string", "null"]
+        affordabilityScore:
+          type: integer
+        walkabilityScore:
+          type: integer
+        transitScore:
+          type: integer
+        nightlifeScore:
+          type: integer
+        safetyScore:
+          type: integer
+        fitnessScore:
+          type: integer
+        petFriendlinessScore:
+          type: integer
+        medianRentalEstimate:
+          type: ["integer", "null"]
+        downtownCommuteEstimateMins:
+          type: ["integer", "null"]
+        populationDensityClass:
+          type: string
+        lifestyleTags:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - name
+        - slug
+        - city
+        - identity
+        - affordabilityScore
+        - walkabilityScore
+        - transitScore
+        - nightlifeScore
+        - safetyScore
+        - fitnessScore
+        - petFriendlinessScore
+        - populationDensityClass
+        - lifestyleTags
+
+    NeighborhoodDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        city:
+          type: string
+        identity:
+          type: string
+        description:
+          type: ["string", "null"]
+        affordabilityScore:
+          type: integer
+        walkabilityScore:
+          type: integer
+        transitScore:
+          type: integer
+        nightlifeScore:
+          type: integer
+        safetyScore:
+          type: integer
+        fitnessScore:
+          type: integer
+        petFriendlinessScore:
+          type: integer
+        medianRentalEstimate:
+          type: ["integer", "null"]
+        downtownCommuteEstimateMins:
+          type: ["integer", "null"]
+        populationDensityClass:
+          type: string
+        lifestyleTags:
+          type: array
+          items:
+            type: string
+        lastReviewedDate:
+          type: ["string", "null"]
+      required:
+        - id
+        - name
+        - slug
+        - city
+        - identity
+        - affordabilityScore
+        - walkabilityScore
+        - transitScore
+        - nightlifeScore
+        - safetyScore
+        - fitnessScore
+        - petFriendlinessScore
+        - populationDensityClass
+        - lifestyleTags
+
+    NeighborhoodAdmin:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        city:
+          type: string
+        identity:
+          type: string
+        description:
+          type: ["string", "null"]
+        affordabilityScore:
+          type: integer
+        walkabilityScore:
+          type: integer
+        transitScore:
+          type: integer
+        nightlifeScore:
+          type: integer
+        safetyScore:
+          type: integer
+        fitnessScore:
+          type: integer
+        petFriendlinessScore:
+          type: integer
+        affordabilityScoreNote:
+          type: ["string", "null"]
+        walkabilityScoreNote:
+          type: ["string", "null"]
+        transitScoreNote:
+          type: ["string", "null"]
+        nightlifeScoreNote:
+          type: ["string", "null"]
+        safetyScoreNote:
+          type: ["string", "null"]
+        fitnessScoreNote:
+          type: ["string", "null"]
+        petFriendlinessScoreNote:
+          type: ["string", "null"]
+        medianRentalEstimate:
+          type: ["integer", "null"]
+        downtownCommuteEstimateMins:
+          type: ["integer", "null"]
+        populationDensityClass:
+          type: string
+        lifestyleTags:
+          type: array
+          items:
+            type: string
+        lastReviewedDate:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - slug
+        - city
+        - identity
+        - affordabilityScore
+        - walkabilityScore
+        - transitScore
+        - nightlifeScore
+        - safetyScore
+        - fitnessScore
+        - petFriendlinessScore
+        - populationDensityClass
+        - lifestyleTags
+        - createdAt
+        - updatedAt
+
+    NeighborhoodUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        identity:
+          type: string
+        description:
+          type: string
+        affordabilityScore:
+          type: integer
+          minimum: 1
+          maximum: 5
+        walkabilityScore:
+          type: integer
+          minimum: 1
+          maximum: 5
+        transitScore:
+          type: integer
+          minimum: 1
+          maximum: 5
+        nightlifeScore:
+          type: integer
+          minimum: 1
+          maximum: 5
+        safetyScore:
+          type: integer
+          minimum: 1
+          maximum: 5
+        fitnessScore:
+          type: integer
+          minimum: 1
+          maximum: 5
+        petFriendlinessScore:
+          type: integer
+          minimum: 1
+          maximum: 5
+        affordabilityScoreNote:
+          type: string
+        walkabilityScoreNote:
+          type: string
+        transitScoreNote:
+          type: string
+        nightlifeScoreNote:
+          type: string
+        safetyScoreNote:
+          type: string
+        fitnessScoreNote:
+          type: string
+        petFriendlinessScoreNote:
+          type: string
+        medianRentalEstimate:
+          type: integer
+        downtownCommuteEstimateMins:
+          type: integer
+        populationDensityClass:
+          type: string
+        lifestyleTags:
+          type: array
+          items:
+            type: string
+
+    UserWeights:
+      type: object
+      properties:
+        affordability:
+          type: integer
+          minimum: 0
+          maximum: 100
+        walkability:
+          type: integer
+          minimum: 0
+          maximum: 100
+        transit:
+          type: integer
+          minimum: 0
+          maximum: 100
+        nightlife:
+          type: integer
+          minimum: 0
+          maximum: 100
+        safety:
+          type: integer
+          minimum: 0
+          maximum: 100
+        fitness:
+          type: integer
+          minimum: 0
+          maximum: 100
+        petFriendliness:
+          type: integer
+          minimum: 0
+          maximum: 100
+      required:
+        - affordability
+        - walkability
+        - transit
+        - nightlife
+        - safety
+        - fitness
+        - petFriendliness
+
+    QuestionnaireInput:
+      type: object
+      properties:
+        budget:
+          type: integer
+          minimum: 0
+        weights:
+          $ref: "#/components/schemas/UserWeights"
+        workplaceNeighborhood:
+          type: ["string", "null"]
+        usedDefaultWeights:
+          type: boolean
+      required:
+        - budget
+        - weights
+
+    DimensionBreakdown:
+      type: object
+      properties:
+        dimension:
+          type: string
+        score:
+          type: integer
+        weight:
+          type: number
+        contribution:
+          type: number
+      required:
+        - dimension
+        - score
+        - weight
+        - contribution
+
+    NeighborhoodMatch:
+      type: object
+      properties:
+        neighborhood:
+          $ref: "#/components/schemas/Neighborhood"
+        compatibilityScore:
+          type: number
+        fitLabel:
+          type: string
+        aiSummary:
+          type: ["string", "null"]
+        aiSummaryError:
+          type: boolean
+        affordabilityWarning:
+          type: boolean
+        dimensionBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/DimensionBreakdown"
+        tradeoffExplanation:
+          type: string
+      required:
+        - neighborhood
+        - compatibilityScore
+        - fitLabel
+        - affordabilityWarning
+        - dimensionBreakdown
+        - tradeoffExplanation
+        - aiSummaryError
+
+    RecommendationResult:
+      type: object
+      properties:
+        sessionId:
+          type: ["integer", "null"]
+        matches:
+          type: array
+          items:
+            $ref: "#/components/schemas/NeighborhoodMatch"
+        usedDefaultWeights:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - matches
+        - usedDefaultWeights
+        - createdAt
+
+    RecommendationSession:
+      type: object
+      properties:
+        id:
+          type: integer
+        budget:
+          type: integer
+        usedDefaultWeights:
+          type: boolean
+        resultsCount:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - budget
+        - usedDefaultWeights
+        - resultsCount
+        - createdAt
+
+    CompareInput:
+      type: object
+      properties:
+        slugs:
+          type: array
+          items:
+            type: string
+          minItems: 2
+          maxItems: 3
+      required:
+        - slugs
+
+    NeighborhoodComparison:
+      type: object
+      properties:
+        neighborhood:
+          $ref: "#/components/schemas/NeighborhoodDetail"
+        strengths:
+          type: array
+          items:
+            type: string
+        tradeoffs:
+          type: array
+          items:
+            type: string
+      required:
+        - neighborhood
+        - strengths
+        - tradeoffs
+
+    Analytics:
+      type: object
+      properties:
+        questionnaireStarts:
+          type: integer
+        questionnaireCompletions:
+          type: integer
+        recommendationSessions:
+          type: integer
+        favoriteSaves:
+          type: integer
+        registeredUsers:
+          type: integer
+        guestSessions:
+          type: integer
+        adminNeighborhoodUpdates:
+          type: integer
+        aiSummariesGenerated:
+          type: integer
+        aiCacheHits:
+          type: integer
+        aiCacheMisses:
+          type: integer
+      required:
+        - questionnaireStarts
+        - questionnaireCompletions
+        - recommendationSessions
+        - favoriteSaves
+        - registeredUsers
+        - guestSessions
+        - adminNeighborhoodUpdates
+        - aiSummariesGenerated
+        - aiCacheHits
+        - aiCacheMisses
