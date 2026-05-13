@@ -72,7 +72,7 @@ export default function Register() {
               </div>
               {register_.isError && (
                 <div className="text-xs text-destructive bg-destructive/10 p-2 rounded">
-                  {(register_.error as any)?.response?.data?.error ?? "Registration failed. Please try again."}
+                  {(register_.error as any)?.data?.error ?? "Registration failed. Please try again."}
                 </div>
               )}
               <Button type="submit" className="w-full" disabled={register_.isPending} data-testid="btn-register">

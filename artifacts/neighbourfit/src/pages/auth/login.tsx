@@ -63,7 +63,7 @@ export default function Login() {
               </div>
               {login.isError && (
                 <div className="text-xs text-destructive bg-destructive/10 p-2 rounded">
-                  {(login.error as any)?.response?.data?.error ?? "Sign in failed. Please try again."}
+                  {(login.error as any)?.data?.error ?? "Sign in failed. Please try again."}
                 </div>
               )}
               <Button type="submit" className="w-full" disabled={login.isPending} data-testid="btn-login">

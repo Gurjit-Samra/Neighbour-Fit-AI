@@ -37,6 +37,10 @@ router.post("/auth/register", async (req, res): Promise<void> => {
   req.session.userId = user.id;
   req.session.userRole = user.role;
 
+  await new Promise<void>((resolve, reject) => {
+    req.session.save((err) => (err ? reject(err) : resolve()));
+  });
+
   await trackEvent("registration_completed", { userId: user.id });
 
   res.status(201).json({
@@ -69,6 +73,10 @@ router.post("/auth/login", async (req, res): Promise<void> => {
 
   req.session.userId = user.id;
   req.session.userRole = user.role;
+
+  await new Promise<void>((resolve, reject) => {
+    req.session.save((err) => (err ? reject(err) : resolve()));
+  });
 
   await trackEvent("login_completed", { userId: user.id });
 
