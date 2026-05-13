@@ -375,6 +375,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /neighborhoods/compare-summary:
+    post:
+      operationId: compareNeighbourhoodsSummary
+      tags: [comparison]
+      summary: Generate AI comparison overview for 2-3 neighbourhoods
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompareOverviewInput"
+      responses:
+        "200":
+          description: AI comparison overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompareOverviewResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   # Admin
   /admin/neighborhoods:
     get:
@@ -477,6 +502,26 @@ components:
           type: string
       required:
         - answer
+
+    CompareOverviewInput:
+      type: object
+      required:
+        - slugs
+      properties:
+        slugs:
+          type: array
+          items:
+            type: string
+          minItems: 2
+          maxItems: 3
+
+    CompareOverviewResponse:
+      type: object
+      required:
+        - overview
+      properties:
+        overview:
+          type: string
 
     HealthStatus:
       type: object

@@ -20,6 +20,8 @@ import type {
   Analytics,
   AuthResponse,
   CompareInput,
+  CompareOverviewInput,
+  CompareOverviewResponse,
   ErrorResponse,
   HealthStatus,
   LoginInput,
@@ -1267,6 +1269,97 @@ export const useCompareNeighborhoods = <
   TContext
 > => {
   return useMutation(getCompareNeighborhoodsMutationOptions(options));
+};
+
+/**
+ * @summary Generate AI comparison overview for 2-3 neighbourhoods
+ */
+export const getCompareNeighbourhoodsSummaryUrl = () => {
+  return `/api/neighborhoods/compare-summary`;
+};
+
+export const compareNeighbourhoodsSummary = async (
+  compareOverviewInput: CompareOverviewInput,
+  options?: RequestInit,
+): Promise<CompareOverviewResponse> => {
+  return customFetch<CompareOverviewResponse>(
+    getCompareNeighbourhoodsSummaryUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(compareOverviewInput),
+    },
+  );
+};
+
+export const getCompareNeighbourhoodsSummaryMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof compareNeighbourhoodsSummary>>,
+    TError,
+    { data: BodyType<CompareOverviewInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof compareNeighbourhoodsSummary>>,
+  TError,
+  { data: BodyType<CompareOverviewInput> },
+  TContext
+> => {
+  const mutationKey = ["compareNeighbourhoodsSummary"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof compareNeighbourhoodsSummary>>,
+    { data: BodyType<CompareOverviewInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return compareNeighbourhoodsSummary(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CompareNeighbourhoodsSummaryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof compareNeighbourhoodsSummary>>
+>;
+export type CompareNeighbourhoodsSummaryMutationBody =
+  BodyType<CompareOverviewInput>;
+export type CompareNeighbourhoodsSummaryMutationError =
+  ErrorType<ErrorResponse>;
+
+/**
+ * @summary Generate AI comparison overview for 2-3 neighbourhoods
+ */
+export const useCompareNeighbourhoodsSummary = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof compareNeighbourhoodsSummary>>,
+    TError,
+    { data: BodyType<CompareOverviewInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof compareNeighbourhoodsSummary>>,
+  TError,
+  { data: BodyType<CompareOverviewInput> },
+  TContext
+> => {
+  return useMutation(getCompareNeighbourhoodsSummaryMutationOptions(options));
 };
 
 /**

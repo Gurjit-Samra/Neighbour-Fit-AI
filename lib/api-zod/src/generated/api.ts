@@ -386,6 +386,23 @@ export const CompareNeighborhoodsResponse = zod.array(
 );
 
 /**
+ * @summary Generate AI comparison overview for 2-3 neighbourhoods
+ */
+export const compareNeighbourhoodsSummaryBodySlugsMin = 2;
+export const compareNeighbourhoodsSummaryBodySlugsMax = 3;
+
+export const CompareNeighbourhoodsSummaryBody = zod.object({
+  slugs: zod
+    .array(zod.string())
+    .min(compareNeighbourhoodsSummaryBodySlugsMin)
+    .max(compareNeighbourhoodsSummaryBodySlugsMax),
+});
+
+export const CompareNeighbourhoodsSummaryResponse = zod.object({
+  overview: zod.string(),
+});
+
+/**
  * @summary Admin list all neighborhoods with full data
  */
 export const AdminListNeighborhoodsResponseItem = zod.object({

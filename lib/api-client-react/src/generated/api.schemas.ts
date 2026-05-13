@@ -15,6 +15,18 @@ export interface NeighbourhoodAskResponse {
   answer: string;
 }
 
+export interface CompareOverviewInput {
+  /**
+   * @minItems 2
+   * @maxItems 3
+   */
+  slugs: string[];
+}
+
+export interface CompareOverviewResponse {
+  overview: string;
+}
+
 export interface HealthStatus {
   status: string;
 }
