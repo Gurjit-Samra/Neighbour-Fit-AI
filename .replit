@@ -27,9 +27,16 @@ externalPort = 8080
 localPort = 8081
 externalPort = 80
 
+[[ports]]
+localPort = 20938
+externalPort = 3000
+
 [userenv]
 
 [userenv.shared]
 ADMIN_EMAIL = "admin@neighbourfit.ca"
 ADMIN_PASSWORD = "NeighbourFit2025!"
 NODE_ENV = "development"
+
+[nix]
+channel = "stable-25_05"
