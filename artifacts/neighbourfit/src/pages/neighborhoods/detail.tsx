@@ -1,8 +1,6 @@
 import { useParams, Link } from "wouter";
 import { useGetNeighborhood, useGetMe, useListFavorites, useAddFavorite, useRemoveFavorite } from "@workspace/api-client-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { ScoreBar } from "@/components/neighborhood/ScoreBar";
 import { COMMUTE_DISCLAIMER, getDensityLabel } from "@/lib/utils";
 import { Heart, MapPin, ArrowLeft, Info, Loader2 } from "lucide-react";
@@ -40,7 +38,9 @@ export default function NeighborhoodDetail() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Neighbourhood not found.</p>
-        <Link href="/neighborhoods"><Button variant="outline">Browse all</Button></Link>
+        <Link href="/neighborhoods">
+          <button className="px-4 py-2 bg-card border border-card-border rounded-xl text-sm font-medium hover:shadow-sm transition-shadow">Browse all</button>
+        </Link>
       </div>
     );
   }
@@ -55,23 +55,27 @@ export default function NeighborhoodDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-10 px-4">
+    <div className="min-h-screen py-10 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="mb-6">
           <Link href="/neighborhoods">
-            <Button variant="ghost" size="sm" className="gap-1 mb-4">
+            <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5">
               <ArrowLeft className="h-4 w-4" /> All neighbourhoods
-            </Button>
+            </button>
           </Link>
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <h1 className="text-4xl font-bold">{n.name}</h1>
-              <p className="text-muted-foreground text-lg mt-1">{n.city} · {getDensityLabel(n.populationDensityClass)} community</p>
+              <h1 className="text-4xl font-bold text-foreground">{n.name}</h1>
+              <p className="text-muted-foreground text-base mt-1">{n.city} · {getDensityLabel(n.populationDensityClass)} community</p>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className={cn("gap-1", isFavorite && "text-primary border-primary/50")}
+              <button
+                className={cn(
+                  "flex items-center gap-1.5 px-4 py-2 bg-card border rounded-xl text-sm font-medium transition-all",
+                  isFavorite
+                    ? "border-primary/50 text-primary"
+                    : "border-card-border text-foreground hover:shadow-sm"
+                )}
                 onClick={toggleFavorite}
                 disabled={addFav.isPending || removeFav.isPending}
                 data-testid="btn-favorite"
@@ -81,80 +85,83 @@ export default function NeighborhoodDetail() {
                   : <Heart className={cn("h-4 w-4", isFavorite && "fill-primary")} />
                 }
                 {isFavorite ? "Saved" : "Save"}
-              </Button>
+              </button>
               <Link href={`/compare?slugs=${n.slug}`}>
-                <Button variant="outline" size="default">Compare</Button>
+                <button className="px-4 py-2 bg-card border border-card-border rounded-xl text-sm font-medium hover:shadow-sm transition-shadow">Compare</button>
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader><CardTitle>About {n.name}</CardTitle></CardHeader>
-            <CardContent>
-              <p className="text-sm font-semibold text-primary mb-2">{n.identity}</p>
-              {n.description && <p className="text-sm text-muted-foreground leading-relaxed">{n.description}</p>}
-              <div className="flex flex-wrap gap-1.5 mt-4">
-                {(n.lifestyleTags ?? []).map((tag: string) => (
-                  <Badge key={tag} variant="secondary">{tag}</Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        <div className="space-y-4">
+          {/* About */}
+          <div className="bg-card border border-card-border rounded-xl shadow-sm p-6">
+            <h2 className="font-semibold text-base mb-3 text-foreground">About {n.name}</h2>
+            <p className="text-sm font-medium text-primary mb-2">{n.identity}</p>
+            {n.description && <p className="text-sm text-muted-foreground leading-relaxed">{n.description}</p>}
+            <div className="flex flex-wrap gap-1.5 mt-4">
+              {(n.lifestyleTags ?? []).map((tag: string) => (
+                <Badge key={tag} variant="secondary">{tag}</Badge>
+              ))}
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader><CardTitle>Lifestyle scores</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
+          {/* Lifestyle scores */}
+          <div className="bg-card border border-card-border rounded-xl shadow-sm p-6">
+            <h2 className="font-semibold text-base mb-4 text-foreground">Lifestyle scores</h2>
+            <div className="space-y-4">
               {SCORE_DIMS.map((d) => (
                 <div key={d.key}>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm font-medium flex items-center gap-1.5">
+                    <span className="text-sm font-medium flex items-center gap-1.5 text-foreground">
                       <span>{d.emoji}</span>{d.label}
                     </span>
-                    <span className="text-sm font-bold">{(n as any)[d.key]}/5</span>
+                    <span className="text-sm font-bold text-foreground">{(n as any)[d.key]}/5</span>
                   </div>
                   <ScoreBar score={(n as any)[d.key]} size="md" />
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader><CardTitle>Quick facts</CardTitle></CardHeader>
-            <CardContent>
-              <dl className="space-y-3">
-                {n.medianRentalEstimate && (
-                  <div className="flex justify-between text-sm">
-                    <dt className="text-muted-foreground">Median rental estimate</dt>
-                    <dd className="font-semibold">~${n.medianRentalEstimate.toLocaleString()}/mo</dd>
-                  </div>
-                )}
-                {n.downtownCommuteEstimateMins && (
-                  <>
-                    <div className="flex justify-between text-sm">
-                      <dt className="text-muted-foreground">Commute to downtown</dt>
-                      <dd className="font-semibold">~{n.downtownCommuteEstimateMins} minutes</dd>
-                    </div>
-                    <p className="text-xs text-muted-foreground flex items-start gap-1">
-                      <Info className="h-3 w-3 mt-0.5 shrink-0" />{COMMUTE_DISCLAIMER}
-                    </p>
-                  </>
-                )}
-                <div className="flex justify-between text-sm">
-                  <dt className="text-muted-foreground">Density class</dt>
-                  <dd className="font-semibold capitalize">{getDensityLabel(n.populationDensityClass)}</dd>
+          {/* Quick facts */}
+          <div className="bg-card border border-card-border rounded-xl shadow-sm p-6">
+            <h2 className="font-semibold text-base mb-4 text-foreground">Quick facts</h2>
+            <dl className="space-y-3 divide-y divide-border">
+              {n.medianRentalEstimate && (
+                <div className="flex justify-between text-sm pt-3 first:pt-0">
+                  <dt className="text-muted-foreground">Median rental estimate</dt>
+                  <dd className="font-semibold">~${n.medianRentalEstimate.toLocaleString()}/mo</dd>
                 </div>
-              </dl>
-            </CardContent>
-          </Card>
+              )}
+              {n.downtownCommuteEstimateMins && (
+                <>
+                  <div className="flex justify-between text-sm pt-3">
+                    <dt className="text-muted-foreground">Commute to downtown</dt>
+                    <dd className="font-semibold">~{n.downtownCommuteEstimateMins} minutes</dd>
+                  </div>
+                  <p className="text-xs text-muted-foreground flex items-start gap-1 pt-2">
+                    <Info className="h-3 w-3 mt-0.5 shrink-0" />{COMMUTE_DISCLAIMER}
+                  </p>
+                </>
+              )}
+              <div className="flex justify-between text-sm pt-3">
+                <dt className="text-muted-foreground">Density class</dt>
+                <dd className="font-semibold capitalize">{getDensityLabel(n.populationDensityClass)}</dd>
+              </div>
+            </dl>
+          </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-2">
             <Link href="/questionnaire">
-              <Button className="gap-1"><MapPin className="h-4 w-4" />Check my fit</Button>
+              <button className="flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity">
+                <MapPin className="h-4 w-4" />Check my fit
+              </button>
             </Link>
             <Link href={`/compare?slugs=${n.slug}`}>
-              <Button variant="outline">Compare neighbourhoods</Button>
+              <button className="px-5 py-2.5 bg-card border border-card-border text-sm font-medium rounded-xl hover:shadow-sm transition-shadow">
+                Compare neighbourhoods
+              </button>
             </Link>
           </div>
         </div>

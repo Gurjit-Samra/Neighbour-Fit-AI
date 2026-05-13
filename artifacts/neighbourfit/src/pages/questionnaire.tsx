@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useLocation, Link } from "wouter";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -23,19 +21,6 @@ const DIMENSION_INFO: Array<{ key: keyof typeof DEFAULT_WEIGHTS; label: string; 
   { key: "petFriendliness", label: "Pet-friendliness", desc: "Dog parks, off-leash areas, pet-welcome culture", emoji: "🐾" },
 ];
 
-function StepIndicator({ step, total }: { step: number; total: number }) {
-  return (
-    <div className="flex items-center gap-2 mb-8 justify-center">
-      {Array.from({ length: total }).map((_, i) => (
-        <div key={i} className={cn(
-          "h-2 rounded-full transition-all",
-          i === step ? "w-8 bg-primary" : i < step ? "w-4 bg-primary/40" : "w-4 bg-muted"
-        )} />
-      ))}
-    </div>
-  );
-}
-
 export default function Questionnaire() {
   const [, setLocation] = useLocation();
   const [step, setStep] = useState(0);
@@ -46,6 +31,7 @@ export default function Questionnaire() {
   const [useDefaults, setUseDefaults] = useState(false);
 
   const totalWeight = Object.values(weights).reduce((s, v) => s + v, 0);
+  const progressPct = ((step + 1) / STEPS.length) * 100;
 
   const handleSubmit = () => {
     const data = {
@@ -63,182 +49,221 @@ export default function Questionnaire() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-10 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold">Find your Calgary neighbourhood</h1>
-          <p className="text-muted-foreground mt-2">Step {step + 1} of {STEPS.length}: {STEPS[step]}</p>
+    <div className="min-h-screen bg-background flex flex-col py-10 px-4">
+      <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
+
+        {/* Card header: title + skip */}
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="text-lg font-semibold text-foreground leading-tight">
+              Find Your Perfect Calgary Neighbourhood
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Step {step + 1} of {STEPS.length}: {STEPS[step]}
+            </p>
+          </div>
+          <Link href="/">
+            <span className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer whitespace-nowrap ml-6 mt-0.5">
+              Skip questionnaire →
+            </span>
+          </Link>
         </div>
-        <StepIndicator step={step} total={STEPS.length} />
 
-        {step === 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>What's your monthly rent budget?</CardTitle>
-              <CardDescription>We'll show an affordability warning if a neighbourhood typically exceeds this.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label>Monthly rent budget (CAD)</Label>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-bold text-primary">${budget.toLocaleString()}</span>
-                  <span className="text-muted-foreground text-sm">/ month</span>
-                </div>
-                <Slider
-                  min={900} max={4000} step={50}
-                  value={[budget]}
-                  onValueChange={([v]) => { setBudget(v); setBudgetInput(String(v)); }}
-                  data-testid="budget-slider"
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>$900</span><span>$4,000</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Or enter manually:
-                </p>
-                <Input
-                  type="number" value={budgetInput} min={900} max={4000}
-                  onChange={(e) => {
-                    setBudgetInput(e.target.value);
-                    const v = parseInt(e.target.value);
-                    if (!isNaN(v) && v >= 900 && v <= 4000) setBudget(v);
-                  }}
-                  className="w-40"
-                />
-              </div>
-              <div className="p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground">
-                Budget is used only for affordability warnings — it doesn't affect your compatibility score.
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Thin progress bar */}
+        <div className="w-full h-0.5 bg-border rounded-full mb-6 overflow-hidden">
+          <div
+            className="h-full bg-foreground rounded-full progress-fill transition-all duration-400"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
 
-        {step === 1 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>What matters most to you?</CardTitle>
-              <CardDescription>
-                Drag the sliders to weight your priorities. Higher = more important.
-                Total weight right now: <span className={cn("font-semibold", totalWeight !== 100 && "text-amber-600")}>{totalWeight}</span>
-                {" "}(doesn't need to be exactly 100 — we normalise automatically).
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-2 mb-2">
-                <input type="checkbox" id="useDefaults" checked={useDefaults} onChange={(e) => setUseDefaults(e.target.checked)} />
-                <Label htmlFor="useDefaults" className="cursor-pointer text-sm">Use balanced default weights instead</Label>
-              </div>
-              {DIMENSION_INFO.map((d) => (
-                <div key={d.key} className={cn("space-y-2", useDefaults && "opacity-40 pointer-events-none")}>
-                  <div className="flex items-center justify-between">
-                    <Label className="flex items-center gap-2 text-sm font-medium">
-                      <span>{d.emoji}</span>
-                      <span>{d.label}</span>
-                    </Label>
-                    <span className="text-sm font-bold text-primary w-6 text-right">{weights[d.key]}</span>
+        {/* Main card */}
+        <div className="bg-card rounded-xl shadow-md border border-card-border flex-1 flex flex-col">
+
+          {/* Step content */}
+          <div className="flex-1 p-7 space-y-0">
+
+            {step === 0 && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-xl font-semibold mb-1">What's your monthly rent budget?</h2>
+                  <p className="text-sm text-muted-foreground">We'll flag an affordability warning if a neighbourhood typically exceeds this.</p>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-bold text-foreground">${budget.toLocaleString()}</span>
+                    <span className="text-muted-foreground text-sm">/ month</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">{d.desc}</p>
                   <Slider
-                    min={0} max={40} step={1}
-                    value={[weights[d.key]]}
-                    onValueChange={([v]) => setWeight(d.key, v)}
-                    disabled={useDefaults}
-                    data-testid={`slider-${d.key}`}
+                    min={900} max={4000} step={50}
+                    value={[budget]}
+                    onValueChange={([v]) => { setBudget(v); setBudgetInput(String(v)); }}
+                    data-testid="budget-slider"
+                    className="py-2"
                   />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>$900</span><span>$4,000</span>
+                  </div>
+                  <div className="flex items-center gap-3 pt-1">
+                    <Label className="text-sm text-muted-foreground whitespace-nowrap">Or enter manually:</Label>
+                    <Input
+                      type="number" value={budgetInput} min={900} max={4000}
+                      onChange={(e) => {
+                        setBudgetInput(e.target.value);
+                        const v = parseInt(e.target.value);
+                        if (!isNaN(v) && v >= 900 && v <= 4000) setBudget(v);
+                      }}
+                      className="w-32 bg-background"
+                    />
+                  </div>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
+                <div className="p-3 bg-muted/60 rounded-lg text-xs text-muted-foreground leading-relaxed">
+                  Budget is used only for affordability warnings — it doesn't affect your compatibility score.
+                </div>
+              </div>
+            )}
 
-        {step === 2 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Lifestyle preferences</CardTitle>
-              <CardDescription>Optional but helps tailor your results.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label>Where do you work? (optional)</Label>
-                <p className="text-xs text-muted-foreground">Helps contextualise commute estimates.</p>
-                <Select value={workplace} onValueChange={setWorkplace}>
-                  <SelectTrigger data-testid="workplace-select">
-                    <SelectValue placeholder="Select or skip" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Prefer not to say / remote</SelectItem>
-                    {CALGARY_NEIGHBORHOODS.map((n) => (
-                      <SelectItem key={n} value={n}>{n}</SelectItem>
-                    ))}
-                    <SelectItem value="Downtown Core">Downtown Core</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-amber-600 flex items-start gap-1 mt-1">
-                  <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                  Commute estimates assume a downtown Calgary destination. For other workplaces, use Google Maps.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {step === 3 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Review your preferences</CardTitle>
-              <CardDescription>Everything look right? Hit "See my matches" to run the analysis.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between py-2 border-b border-border">
-                <span className="text-sm text-muted-foreground">Monthly budget</span>
-                <span className="font-semibold">${budget.toLocaleString()}</span>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-border">
-                <span className="text-sm text-muted-foreground">Weight mode</span>
-                <span className="font-semibold">{useDefaults ? "Balanced defaults" : "Custom"}</span>
-              </div>
-              {!useDefaults && (
-                <div className="space-y-2">
-                  {DIMENSION_INFO.sort((a, b) => weights[b.key] - weights[a.key]).map((d) => (
-                    <div key={d.key} className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">{d.emoji} {d.label}</span>
-                      <div className="flex items-center gap-2">
-                        <div className="h-1.5 rounded-full bg-muted w-24 overflow-hidden">
-                          <div className="h-full bg-primary rounded-full" style={{ width: `${(weights[d.key] / 40) * 100}%` }} />
-                        </div>
-                        <span className="font-medium w-4 text-right">{weights[d.key]}</span>
+            {step === 1 && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="text-xl font-semibold mb-1">What matters most to you?</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Drag the sliders to weight your priorities.
+                    Total: <span className={cn("font-semibold", totalWeight !== 100 && "text-amber-600")}>{totalWeight}</span>
+                    {" "}(we normalise to 100% automatically).
+                  </p>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={useDefaults}
+                    onChange={(e) => setUseDefaults(e.target.checked)}
+                    className="w-4 h-4 accent-foreground"
+                  />
+                  <span className="text-sm text-muted-foreground">Use balanced default weights instead</span>
+                </label>
+                <div className={cn("space-y-5", useDefaults && "opacity-40 pointer-events-none")}>
+                  {DIMENSION_INFO.map((d) => (
+                    <div key={d.key} className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <Label className="flex items-center gap-2 text-sm font-medium cursor-default">
+                          <span>{d.emoji}</span>
+                          <span>{d.label}</span>
+                        </Label>
+                        <span className="text-sm font-bold w-6 text-right">{weights[d.key]}</span>
                       </div>
+                      <p className="text-xs text-muted-foreground">{d.desc}</p>
+                      <Slider
+                        min={0} max={40} step={1}
+                        value={[weights[d.key]]}
+                        onValueChange={([v]) => setWeight(d.key, v)}
+                        disabled={useDefaults}
+                        data-testid={`slider-${d.key}`}
+                      />
                     </div>
                   ))}
                 </div>
-              )}
-              {workplace !== "none" && (
-                <div className="flex items-center justify-between py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">Work location</span>
-                  <span className="font-semibold">{workplace}</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
+              </div>
+            )}
 
-        <div className="flex gap-3 mt-6 justify-between">
-          <Button
-            variant="outline"
-            onClick={() => step === 0 ? setLocation("/") : setStep(step - 1)}
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            {step === 0 ? "Cancel" : "Back"}
-          </Button>
-          {step < STEPS.length - 1 ? (
-            <Button onClick={() => setStep(step + 1)} data-testid={`btn-next-${step}`}>
-              Next <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          ) : (
-            <Button onClick={handleSubmit} data-testid="btn-submit">
-              See my matches <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          )}
+            {step === 2 && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-xl font-semibold mb-1">Lifestyle preferences</h2>
+                  <p className="text-sm text-muted-foreground">Optional, but helps tailor your results.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Where do you work? (optional)</Label>
+                  <p className="text-xs text-muted-foreground">Helps contextualise commute estimates.</p>
+                  <Select value={workplace} onValueChange={setWorkplace}>
+                    <SelectTrigger data-testid="workplace-select" className="bg-background">
+                      <SelectValue placeholder="Select or skip" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Prefer not to say / remote</SelectItem>
+                      {CALGARY_NEIGHBORHOODS.map((n) => (
+                        <SelectItem key={n} value={n}>{n}</SelectItem>
+                      ))}
+                      <SelectItem value="Downtown Core">Downtown Core</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-amber-600 flex items-start gap-1 mt-1">
+                    <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                    Commute estimates assume a downtown Calgary destination. For other workplaces, use Google Maps.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="text-xl font-semibold mb-1">Review your preferences</h2>
+                  <p className="text-sm text-muted-foreground">Everything look right? Hit "See my matches" to run the analysis.</p>
+                </div>
+                <div className="space-y-0 divide-y divide-border">
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-muted-foreground">Monthly budget</span>
+                    <span className="font-semibold">${budget.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-muted-foreground">Weight mode</span>
+                    <span className="font-semibold">{useDefaults ? "Balanced defaults" : "Custom"}</span>
+                  </div>
+                  {!useDefaults && (
+                    <div className="py-3 space-y-2">
+                      {DIMENSION_INFO.sort((a, b) => weights[b.key] - weights[a.key]).map((d) => (
+                        <div key={d.key} className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{d.emoji} {d.label}</span>
+                          <div className="flex items-center gap-2">
+                            <div className="h-1.5 rounded-full bg-muted w-24 overflow-hidden">
+                              <div className="h-full bg-foreground rounded-full" style={{ width: `${(weights[d.key] / 40) * 100}%` }} />
+                            </div>
+                            <span className="font-medium w-4 text-right">{weights[d.key]}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {workplace !== "none" && (
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-sm text-muted-foreground">Work location</span>
+                      <span className="font-semibold">{workplace}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Card footer: navigation buttons */}
+          <div className="flex items-center justify-between px-7 py-5 border-t border-card-border">
+            <button
+              onClick={() => step === 0 ? setLocation("/") : setStep(step - 1)}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {step === 0 ? "Cancel" : "Back"}
+            </button>
+
+            {step < STEPS.length - 1 ? (
+              <button
+                onClick={() => setStep(step + 1)}
+                data-testid={`btn-next-${step}`}
+                className="flex items-center gap-2 px-6 py-2.5 bg-foreground text-background text-sm font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+              >
+                Next <ArrowRight className="h-4 w-4" />
+              </button>
+            ) : (
+              <button
+                onClick={handleSubmit}
+                data-testid="btn-submit"
+                className="flex items-center gap-2 px-6 py-2.5 bg-foreground text-background text-sm font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+              >
+                See my matches <ArrowRight className="h-4 w-4" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

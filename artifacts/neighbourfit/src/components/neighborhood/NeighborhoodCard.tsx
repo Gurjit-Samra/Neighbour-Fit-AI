@@ -1,5 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScoreBar } from "./ScoreBar";
 import { FitBadge } from "./FitBadge";
@@ -80,21 +78,28 @@ export function NeighborhoodCard({
   showFullDetail = false,
 }: NeighborhoodCardProps) {
   return (
-    <Card className={cn("relative overflow-hidden", rank === 1 && "border-primary/40 shadow-md")}>
+    <div className={cn(
+      "bg-card border rounded-xl shadow-sm overflow-hidden",
+      rank === 1 ? "border-primary/30 shadow-md" : "border-card-border"
+    )}>
+      {/* #1 match banner */}
       {rank === 1 && (
-        <div className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 absolute top-0 left-0 right-0">
-          #1 Best match
+        <div className="bg-primary text-primary-foreground text-xs font-bold px-4 py-1.5 flex items-center gap-1.5">
+          <span>★</span> Best match for your lifestyle
         </div>
       )}
-      <CardContent className={cn("pt-6 pb-6", rank === 1 && "pt-10")}>
-        {/* Header */}
-        <div className="flex items-start justify-between gap-4 mb-4">
+
+      <div className={cn("p-6", rank === 1 ? "" : "")}>
+        {/* Header row */}
+        <div className="flex items-start justify-between gap-4 mb-3">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-0.5">
               {rank > 1 && (
-                <span className="text-xs text-muted-foreground font-semibold">#{rank}</span>
+                <span className="text-xs font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                  #{rank}
+                </span>
               )}
-              <h3 className="text-xl font-bold">{n.name}</h3>
+              <h3 className="text-xl font-bold text-foreground">{n.name}</h3>
             </div>
             <p className="text-sm text-muted-foreground">{n.identity}</p>
           </div>
@@ -112,11 +117,11 @@ export function NeighborhoodCard({
 
         {/* AI summary */}
         {aiSummary && (
-          <div className="bg-accent/40 rounded-lg p-3 mb-4 text-sm text-foreground leading-relaxed border border-accent">
-            <p className="text-xs font-semibold text-accent-foreground mb-1 flex items-center gap-1">
+          <div className="bg-accent/40 rounded-xl p-3.5 mb-4 text-sm leading-relaxed border border-accent">
+            <p className="text-xs font-semibold text-muted-foreground mb-1.5 flex items-center gap-1">
               <span>✨</span> AI-generated insight
             </p>
-            {aiSummary}
+            <p className="text-foreground">{aiSummary}</p>
           </div>
         )}
         {aiSummaryError && (
@@ -125,13 +130,11 @@ export function NeighborhoodCard({
           </div>
         )}
 
-        {/* Scores */}
-        <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-4">
+        {/* Score bars grid */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 mb-4">
           {SCORE_DIMS.map((d) => (
             <div key={d.key}>
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="text-xs text-muted-foreground">{d.label}</span>
-              </div>
+              <span className="text-xs text-muted-foreground mb-0.5 block">{d.label}</span>
               <ScoreBar score={n[d.key]} size="sm" />
             </div>
           ))}
@@ -139,18 +142,16 @@ export function NeighborhoodCard({
 
         {/* Tradeoff */}
         {tradeoffExplanation && (
-          <p className="text-xs text-muted-foreground mb-4 italic">{tradeoffExplanation}</p>
+          <p className="text-xs text-muted-foreground mb-4 italic leading-relaxed">{tradeoffExplanation}</p>
         )}
 
         {/* Quick facts */}
-        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground mb-4">
+        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground mb-3">
           {n.medianRentalEstimate && (
-            <span>~${n.medianRentalEstimate.toLocaleString()}/mo est. rent</span>
+            <span className="font-medium">~${n.medianRentalEstimate.toLocaleString()}/mo est. rent</span>
           )}
           {n.downtownCommuteEstimateMins && (
-            <span title={COMMUTE_DISCLAIMER}>
-              ~{n.downtownCommuteEstimateMins} min to downtown *
-            </span>
+            <span>~{n.downtownCommuteEstimateMins} min to downtown</span>
           )}
           <span className="capitalize">{n.populationDensityClass} density</span>
         </div>
@@ -163,44 +164,60 @@ export function NeighborhoodCard({
         )}
 
         {affordabilityWarning && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-2 mb-4 text-xs text-amber-700">
-            ⚠️ Median rent typically exceeds your stated budget.
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 mb-4 text-xs text-amber-700">
+            ⚠️ Median rent in this neighbourhood typically exceeds your stated budget.
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Action buttons */}
+        <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-card-border mt-2">
           <Link href={`/neighborhoods/${n.slug}`}>
-            <Button variant="outline" size="sm" className="gap-1">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-background border border-card-border rounded-lg hover:shadow-sm transition-shadow mt-3">
               <MapPin className="h-3.5 w-3.5" /> Details
-            </Button>
+            </button>
           </Link>
           {onFavorite && (
-            <Button
-              variant="outline" size="sm"
-              className={cn("gap-1", isFavorite && "text-primary border-primary/50")}
+            <button
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border rounded-lg transition-all mt-3",
+                isFavorite
+                  ? "border-primary/50 text-primary bg-primary/5"
+                  : "bg-background border-card-border hover:shadow-sm"
+              )}
               onClick={onFavorite}
               disabled={isFavoriteLoading}
               data-testid={`btn-favorite-${n.slug}`}
             >
-              {isFavoriteLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Heart className={cn("h-3.5 w-3.5", isFavorite && "fill-primary")} />}
+              {isFavoriteLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Heart className={cn("h-3.5 w-3.5", isFavorite && "fill-primary text-primary")} />
+              )}
               {isFavorite ? "Saved" : "Save"}
-            </Button>
+            </button>
           )}
           {onCompare && (
-            <Button
-              variant="outline" size="sm"
-              className={cn("gap-1", isInCompare && "text-primary border-primary/50")}
+            <button
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border rounded-lg transition-all mt-3",
+                isInCompare
+                  ? "border-primary/50 text-primary bg-primary/5"
+                  : "bg-background border-card-border hover:shadow-sm"
+              )}
               onClick={onCompare}
               disabled={isCompareLoading}
               data-testid={`btn-compare-${n.slug}`}
             >
-              {isCompareLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <GitCompare className="h-3.5 w-3.5" />}
+              {isCompareLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <GitCompare className="h-3.5 w-3.5" />
+              )}
               {isInCompare ? "In compare" : "Compare"}
-            </Button>
+            </button>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
