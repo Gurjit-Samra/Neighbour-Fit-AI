@@ -19,6 +19,7 @@ import Favorites from "@/pages/favorites";
 import HistoryPage from "@/pages/history";
 import AdminDashboard from "@/pages/admin/index";
 import AdminNeighborhoods from "@/pages/admin/neighborhoods";
+import MapPage from "@/pages/map";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -45,6 +46,7 @@ function Router() {
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/favorites" component={Favorites} />
           <Route path="/history" component={HistoryPage} />
+          <Route path="/map" component={MapPage} />
           <Route path="/admin" component={AdminDashboard} />
           <Route path="/admin/neighborhoods" component={AdminNeighborhoods} />
           <Route component={NotFound} />
