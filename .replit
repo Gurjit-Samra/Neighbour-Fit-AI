@@ -37,6 +37,7 @@ externalPort = 3000
 ADMIN_EMAIL = "admin@neighbourfit.ca"
 ADMIN_PASSWORD = "NeighbourFit2025!"
 NODE_ENV = "development"
+VITE_GOOGLE_MAPS_API_KEY = "AIzaSyC3slM7hhOpjvMmgNrL-XKIhcMJ7jbKG9o"
 
 [nix]
 channel = "stable-25_05"
