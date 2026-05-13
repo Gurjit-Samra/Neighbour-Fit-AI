@@ -28,6 +28,8 @@ import type {
   NeighborhoodComparison,
   NeighborhoodDetail,
   NeighborhoodUpdate,
+  NeighbourhoodAskInput,
+  NeighbourhoodAskResponse,
   QuestionnaireInput,
   RecommendationResult,
   RecommendationSession,
@@ -598,6 +600,93 @@ export function useGetNeighborhood<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary Ask a follow-up question about a neighbourhood
+ */
+export const getAskNeighbourhoodUrl = (slug: string) => {
+  return `/api/neighborhoods/${slug}/ask`;
+};
+
+export const askNeighbourhood = async (
+  slug: string,
+  neighbourhoodAskInput: NeighbourhoodAskInput,
+  options?: RequestInit,
+): Promise<NeighbourhoodAskResponse> => {
+  return customFetch<NeighbourhoodAskResponse>(getAskNeighbourhoodUrl(slug), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(neighbourhoodAskInput),
+  });
+};
+
+export const getAskNeighbourhoodMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof askNeighbourhood>>,
+    TError,
+    { slug: string; data: BodyType<NeighbourhoodAskInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof askNeighbourhood>>,
+  TError,
+  { slug: string; data: BodyType<NeighbourhoodAskInput> },
+  TContext
+> => {
+  const mutationKey = ["askNeighbourhood"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof askNeighbourhood>>,
+    { slug: string; data: BodyType<NeighbourhoodAskInput> }
+  > = (props) => {
+    const { slug, data } = props ?? {};
+
+    return askNeighbourhood(slug, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AskNeighbourhoodMutationResult = NonNullable<
+  Awaited<ReturnType<typeof askNeighbourhood>>
+>;
+export type AskNeighbourhoodMutationBody = BodyType<NeighbourhoodAskInput>;
+export type AskNeighbourhoodMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Ask a follow-up question about a neighbourhood
+ */
+export const useAskNeighbourhood = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof askNeighbourhood>>,
+    TError,
+    { slug: string; data: BodyType<NeighbourhoodAskInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof askNeighbourhood>>,
+  TError,
+  { slug: string; data: BodyType<NeighbourhoodAskInput> },
+  TContext
+> => {
+  return useMutation(getAskNeighbourhoodMutationOptions(options));
+};
 
 /**
  * @summary Generate neighborhood recommendations

@@ -11,11 +11,30 @@ const CACHE_TTL_HOURS = 24;
 let openaiClient: OpenAI | null = null;
 
 function getOpenAI(): OpenAI | null {
-  if (!process.env.OPENAI_API_KEY) return null;
+  const integrationBaseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+  const integrationApiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+  const directApiKey = process.env.OPENAI_API_KEY;
+
+  if (!integrationBaseURL && !directApiKey) return null;
+
   if (!openaiClient) {
-    openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    openaiClient = new OpenAI({
+      baseURL: integrationBaseURL || undefined,
+      apiKey: integrationBaseURL ? (integrationApiKey ?? "replit") : directApiKey!,
+    });
   }
   return openaiClient;
+}
+
+export function makeOpenAIClient(): OpenAI | null {
+  const integrationBaseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+  const integrationApiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+  const directApiKey = process.env.OPENAI_API_KEY;
+  if (!integrationBaseURL && !directApiKey) return null;
+  return new OpenAI({
+    baseURL: integrationBaseURL || undefined,
+    apiKey: integrationBaseURL ? (integrationApiKey ?? "replit") : directApiKey!,
+  });
 }
 
 function buildCacheKey(
@@ -78,10 +97,9 @@ export async function getAiSummary(
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-5.4",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 180,
-      temperature: 0.7,
+      max_completion_tokens: 180,
     });
 
     const summary = response.choices[0]?.message?.content?.trim() ?? null;

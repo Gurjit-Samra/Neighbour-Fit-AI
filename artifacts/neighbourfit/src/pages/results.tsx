@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation, Link } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCreateRecommendation, useAddFavorite, useRemoveFavorite, useListFavorites, useGetMe } from "@workspace/api-client-react";
+import { useCreateRecommendation, useAddFavorite, useRemoveFavorite, useListFavorites, useGetMe, useAskNeighbourhood } from "@workspace/api-client-react";
 import { loadQuestionnaire } from "@/lib/questionnaire-store";
 import { RadarChartComponent } from "@/components/neighborhood/RadarChart";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ import {
   ExternalLink,
   AlertTriangle,
   Sparkles,
+  SendHorizontal,
+  MessageCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -92,7 +94,10 @@ export default function Results() {
   const createRec = useCreateRecommendation();
   const [compareSet, setCompareSet] = useState<string[]>([]);
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [followUpQuestion, setFollowUpQuestion] = useState("");
+  const [followUpAnswer, setFollowUpAnswer] = useState<string | null>(null);
   const submitted = useRef(false);
+  const askNeighbourhood = useAskNeighbourhood();
 
   useEffect(() => {
     if (submitted.current) return;
@@ -159,6 +164,13 @@ export default function Results() {
     }
   };
 
+  const selectNeighbourhood = (idx: number) => {
+    setSelectedIdx(idx);
+    setFollowUpQuestion("");
+    setFollowUpAnswer(null);
+    askNeighbourhood.reset();
+  };
+
   const toggleCompare = (slug: string) => {
     setCompareSet((prev) => {
       if (prev.includes(slug)) return prev.filter((s) => s !== slug);
@@ -168,6 +180,30 @@ export default function Results() {
       }
       return [...prev, slug];
     });
+  };
+
+  const handleAsk = () => {
+    if (!followUpQuestion.trim() || !selectedNeighbourhood) return;
+    const q = loadQuestionnaire();
+    const topPriorities = q?.weights
+      ? Object.entries(q.weights).sort(([, a], [, b]) => b - a).slice(0, 3).map(([k]) => k)
+      : undefined;
+    askNeighbourhood.mutate(
+      {
+        slug: selectedNeighbourhood.slug,
+        data: {
+          question: followUpQuestion.trim(),
+          compatibilityScore: selected?.compatibilityScore,
+          topPriorities,
+        },
+      },
+      {
+        onSuccess: (data) => {
+          setFollowUpAnswer(data.answer);
+          setFollowUpQuestion("");
+        },
+      }
+    );
   };
 
   if (matches.length === 0) {
@@ -224,7 +260,7 @@ export default function Results() {
                 transition={{ delay: i * 0.07, duration: 0.3 }}
               >
                 <button
-                  onClick={() => setSelectedIdx(i)}
+                  onClick={() => selectNeighbourhood(i)}
                   className={cn(
                     "w-full text-left rounded-lg p-3 border transition-all duration-200",
                     isSelected
@@ -364,7 +400,7 @@ export default function Results() {
                 <g
                   key={pin.slug}
                   style={{ cursor: "pointer" }}
-                  onClick={() => setSelectedIdx(matchIdx)}
+                  onClick={() => selectNeighbourhood(matchIdx)}
                 >
                   {/* Glow ring when selected */}
                   {isSelected && (
@@ -579,6 +615,47 @@ export default function Results() {
                     </div>
                   </div>
                 )}
+
+                {/* Follow-up Q&A */}
+                <div className="px-5 py-4 border-b border-slate-700">
+                  <div className="flex items-center gap-2 mb-3">
+                    <MessageCircle className="h-4 w-4 text-teal-400" />
+                    <h3 className="text-sm font-semibold text-slate-100">Ask about {selectedNeighbourhood.name}</h3>
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={followUpQuestion}
+                      onChange={(e) => setFollowUpQuestion(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter" && !askNeighbourhood.isPending) handleAsk(); }}
+                      placeholder="e.g. Is it good for families? How is parking?"
+                      disabled={askNeighbourhood.isPending}
+                      className="flex-1 min-w-0 text-sm bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-50"
+                    />
+                    <button
+                      onClick={handleAsk}
+                      disabled={!followUpQuestion.trim() || askNeighbourhood.isPending}
+                      className="shrink-0 flex items-center justify-center w-9 h-9 bg-teal-600 hover:bg-teal-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                    >
+                      {askNeighbourhood.isPending
+                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                        : <SendHorizontal className="h-4 w-4" />
+                      }
+                    </button>
+                  </div>
+                  {(followUpAnswer || askNeighbourhood.isError) && (
+                    <div className="mt-3 bg-slate-700/50 border border-slate-600 rounded-lg p-3">
+                      {askNeighbourhood.isError ? (
+                        <p className="text-xs text-red-400">Could not get an answer. Please try again.</p>
+                      ) : (
+                        <>
+                          <p className="text-sm text-slate-200 leading-relaxed">{followUpAnswer}</p>
+                          <p className="text-[10px] text-slate-500 mt-2">AI response — verify details with local sources.</p>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {/* Lifestyle tags */}
                 {selectedNeighbourhood.lifestyleTags?.length > 0 && (

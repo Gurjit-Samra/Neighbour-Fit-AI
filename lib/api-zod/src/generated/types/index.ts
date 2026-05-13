@@ -19,6 +19,8 @@ export * from "./neighborhoodComparison";
 export * from "./neighborhoodDetail";
 export * from "./neighborhoodMatch";
 export * from "./neighborhoodUpdate";
+export * from "./neighbourhoodAskInput";
+export * from "./neighbourhoodAskResponse";
 export * from "./questionnaireInput";
 export * from "./recommendationResult";
 export * from "./recommendationSession";

@@ -116,6 +116,23 @@ export const GetNeighborhoodResponse = zod.object({
 });
 
 /**
+ * @summary Ask a follow-up question about a neighbourhood
+ */
+export const AskNeighbourhoodParams = zod.object({
+  slug: zod.coerce.string(),
+});
+
+export const AskNeighbourhoodBody = zod.object({
+  question: zod.string(),
+  compatibilityScore: zod.number().optional(),
+  topPriorities: zod.array(zod.string()).optional(),
+});
+
+export const AskNeighbourhoodResponse = zod.object({
+  answer: zod.string(),
+});
+
+/**
  * @summary Generate neighborhood recommendations
  */
 export const createRecommendationBodyBudgetMin = 0;

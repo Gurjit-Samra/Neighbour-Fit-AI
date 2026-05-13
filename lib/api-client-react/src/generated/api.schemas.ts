@@ -5,6 +5,16 @@
  * NeighbourFit AI API specification
  * OpenAPI spec version: 0.1.0
  */
+export interface NeighbourhoodAskInput {
+  question: string;
+  compatibilityScore?: number;
+  topPriorities?: string[];
+}
+
+export interface NeighbourhoodAskResponse {
+  answer: string;
+}
+
 export interface HealthStatus {
   status: string;
 }

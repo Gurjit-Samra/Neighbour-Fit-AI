@@ -168,6 +168,43 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /neighborhoods/{slug}/ask:
+    post:
+      operationId: askNeighbourhood
+      tags: [neighborhoods]
+      summary: Ask a follow-up question about a neighbourhood
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NeighbourhoodAskInput"
+      responses:
+        "200":
+          description: AI answer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NeighbourhoodAskResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: AI unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   # Recommendations
   /recommendations:
     post:
@@ -419,6 +456,28 @@ paths:
 
 components:
   schemas:
+    NeighbourhoodAskInput:
+      type: object
+      properties:
+        question:
+          type: string
+        compatibilityScore:
+          type: number
+        topPriorities:
+          type: array
+          items:
+            type: string
+      required:
+        - question
+
+    NeighbourhoodAskResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+      required:
+        - answer
+
     HealthStatus:
       type: object
       properties:
