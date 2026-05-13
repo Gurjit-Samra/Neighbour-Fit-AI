@@ -28,10 +28,12 @@ export default function Results() {
     }
     submitted.current = true;
     createRec.mutate({
-      budget: q.budget,
-      weights: q.weights,
-      workplaceNeighborhood: q.workplaceNeighborhood ?? undefined,
-      usedDefaultWeights: q.usedDefaultWeights,
+      data: {
+        budget: q.budget,
+        weights: q.weights,
+        workplaceNeighborhood: q.workplaceNeighborhood ?? undefined,
+        usedDefaultWeights: q.usedDefaultWeights,
+      },
     });
   }, []);
 

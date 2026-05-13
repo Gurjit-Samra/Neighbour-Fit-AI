@@ -37,11 +37,11 @@ export default function Compare() {
 
   const handleCompare = () => {
     if (slugs.length < 2) return;
-    compare.mutate({ slugs });
+    compare.mutate({ data: { slugs } });
   };
 
   useEffect(() => {
-    if (initialSlugs.length >= 2) compare.mutate({ slugs: initialSlugs });
+    if (initialSlugs.length >= 2) compare.mutate({ data: { slugs: initialSlugs } });
   }, []);
 
   const addSlug = (slug: string) => {

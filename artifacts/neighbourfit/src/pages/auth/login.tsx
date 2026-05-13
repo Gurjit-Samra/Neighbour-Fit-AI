@@ -27,7 +27,7 @@ export default function Login() {
   });
 
   const onSubmit = (data: FormData) => {
-    login.mutate(data, {
+    login.mutate({ data }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
         setLocation("/dashboard");

@@ -31,7 +31,7 @@ export default function Register() {
   });
 
   const onSubmit = (data: FormData) => {
-    register_.mutate({ email: data.email, password: data.password }, {
+    register_.mutate({ data: { email: data.email, password: data.password } }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
         setLocation("/dashboard");
