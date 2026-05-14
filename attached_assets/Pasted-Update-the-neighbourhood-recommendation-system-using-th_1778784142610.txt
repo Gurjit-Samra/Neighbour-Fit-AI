@@ -1,0 +1,489 @@
+Update the neighbourhood recommendation system using the attached Calgary neighbourhood dataset and the following data-science recommendation logic.
+
+You are working with a Calgary neighbourhood dataset that includes lifestyle, affordability, access, and neighbourhood profile columns. The goal is to match users to their top 5 Calgary neighbourhoods based on their questionnaire answers.
+
+## Current Lifestyle Questionnaire Inputs
+
+The app currently collects:
+
+1. Budget
+   - Slider from $1000 to $4000
+   - This represents the user's maximum monthly rent budget.
+
+2. Walkability
+   - Slider from 0 to 100
+   - 0 = not important
+   - 100 = very important
+
+3. Transit
+   - Slider from 0 to 100
+   - 0 = not important
+   - 100 = very important
+
+4. Nightlife & Social
+   - Slider from 0 to 100
+   - 0 = not important
+   - 100 = very important
+
+5. Safety
+   - Slider from 0 to 100
+   - 0 = not important
+   - 100 = very important
+
+6. Fitness & Wellness
+   - Slider from 0 to 100
+   - 0 = not important
+   - 100 = very important
+
+7. Pet
+   - Yes or No
+
+8. Workplace Location
+   - Options:
+     - NE
+     - NW
+     - SE
+     - SW
+     - Downtown
+   - Also includes workplace importance slider from 0 to 100.
+
+## Main Goal
+
+Create an explainable recommendation engine that returns the user's top 5 Calgary neighbourhoods.
+
+Each recommendation should include:
+
+- Neighbourhood name
+- Overall match score as a percentage
+- Short explanation of why it matched
+- Main tradeoff
+- Best-fit lifestyle label
+
+Example output:
+
+1. Beltline — 89% Match
+   - Why it matched: Strong walkability, nightlife, downtown access, and fitness/wellness access.
+   - Tradeoff: Higher noise and potentially higher rent.
+   - Best for: Urban, social, car-light lifestyle.
+
+## Recommendation Engine Requirements
+
+Use an explainable hybrid scoring system.
+
+The final score should combine:
+
+- Budget Fit
+- Walkability Fit
+- Transit Fit
+- Nightlife & Social Fit
+- Safety Fit
+- Fitness & Wellness Fit
+- Pet Fit, only if the user has a pet
+- Workplace Fit
+- Penalties for poor fit
+
+Do not use a black-box ML model. This should be a deterministic, explainable recommendation system based on normalized feature scores and user importance weights.
+
+## Dataset Column Mapping
+
+Use the following dataset columns where available:
+
+### Budget
+Use:
+- Avg 1BR Rent
+- Average Mortgage Payment
+- Avg Home Price
+- Affordability
+- Affordability Score
+- Affordability Band
+
+For now, prioritize Avg 1BR Rent because the questionnaire uses monthly rent budget.
+
+### Walkability
+Use:
+- Walkability
+- Winter Walkability
+- Car dependency level
+
+Walkability Score formula:
+
+Walkability Score =
+0.60 × Walkability
++ 0.25 × Winter Walkability
++ 0.15 × inverse Car Dependency
+
+### Transit
+Use:
+- Transit access
+- Transit Type
+- Car dependency level
+
+Transit Score formula:
+
+Transit Score =
+0.70 × Transit access
++ 0.20 × Transit Type Score
++ 0.10 × inverse Car Dependency
+
+Transit Type Score mapping:
+- CTrain & Bus = 1.0
+- Bus-focused = 0.65
+- Primarily car-based = 0.25
+- Unknown/missing = 0.5
+
+### Nightlife & Social
+Use:
+- Nightlife/social
+- Coffee Shop Density
+- Urban Form
+- Suburban or City-Like
+- Community vibe
+
+Nightlife Score formula:
+
+Nightlife Score =
+0.65 × Nightlife/social
++ 0.20 × Coffee Shop Density
++ 0.15 × Urban Form Score
+
+Urban Form Score mapping:
+- City-like = 1.0
+- Urban = 1.0
+- Balanced = 0.65
+- Mixed = 0.65
+- Suburban = 0.30
+- Unknown/missing = 0.5
+
+### Safety
+Use:
+- Safety perception
+- Crime rate category
+- Noise Level
+
+Safety Score formula:
+
+Safety Score =
+0.70 × Safety perception
++ 0.20 × inverse Crime Rate
++ 0.10 × inverse Noise Level
+
+### Fitness & Wellness
+Use:
+- Fitness & Wellness
+- Parks/green space
+- Walkability
+
+Fitness Score formula:
+
+Fitness Score =
+0.60 × Fitness & Wellness
++ 0.25 × Parks/green space
++ 0.15 × Walkability
+
+### Pet
+Use:
+- Parks/green space
+- Walkability
+- Noise Level
+- Density
+
+Pet Score formula:
+
+Pet Score =
+0.45 × Parks/green space
++ 0.30 × Walkability
++ 0.15 × inverse Noise Level
++ 0.10 × Density Compatibility
+
+Density Compatibility mapping:
+- Medium = 1.0
+- Low-Medium = 0.9
+- Low = 0.85
+- Medium-High = 0.7
+- High = 0.5
+- Unknown/missing = 0.7
+
+If Pet = No, do not include Pet Score in the weighted lifestyle score.
+
+If Pet = Yes, include Pet Score with a default pet importance of 60.
+
+### Workplace Location
+Use:
+- Zone/Quadrant
+- Downtown access
+- University access
+- Airport access
+- Healthcare access
+- Closest major area
+
+For MVP, calculate Workplace Fit using the selected workplace quadrant.
+
+Workplace options:
+- NE
+- NW
+- SE
+- SW
+- Downtown
+
+Workplace scoring matrix:
+
+If workplace is Downtown:
+- Neighbourhood quadrant is Downtown: 1.0
+- Strong Downtown access: 0.85
+- Good Downtown access: 0.70
+- Moderate Downtown access: 0.50
+- Poor Downtown access: 0.25
+
+If workplace is NW:
+- Neighbourhood quadrant is NW: 1.0
+- Downtown: 0.75
+- NE or SW: 0.55
+- SE: 0.35
+
+If workplace is NE:
+- Neighbourhood quadrant is NE: 1.0
+- Downtown: 0.75
+- NW or SE: 0.55
+- SW: 0.35
+
+If workplace is SW:
+- Neighbourhood quadrant is SW: 1.0
+- Downtown: 0.75
+- NW or SE: 0.55
+- NE: 0.35
+
+If workplace is SE:
+- Neighbourhood quadrant is SE: 1.0
+- Downtown: 0.75
+- NE or SW: 0.55
+- NW: 0.35
+
+Normalize all workplace scores to a 0–1 range.
+
+## Data Normalization Requirements
+
+The dataset may contain values like:
+- High
+- Medium
+- Low
+- Very High
+- Very Low
+- Strong
+- Moderate
+- Poor
+- Good
+- Excellent
+- Numeric scores
+- Currency strings like "$1,650"
+
+Create robust normalization helpers that can convert these values into 0–1 scores.
+
+Suggested mappings:
+
+Excellent / Very High / Strong = 1.0  
+High / Good = 0.8  
+Medium / Moderate / Average = 0.5  
+Low / Poor = 0.25  
+Very Low / Very Poor = 0.1  
+Missing / Unknown = 0.5
+
+For inverse values like crime, noise, and car dependency:
+- First normalize the original value
+- Then calculate inverse as 1 - normalized value
+
+For currency columns:
+- Strip "$" and commas
+- Convert to number
+
+## Budget Fit Logic
+
+Budget should be treated as both a constraint and a score.
+
+Use Avg 1BR Rent as the main rent comparison.
+
+Budget Fit:
+- If Avg 1BR Rent <= 90% of user budget: 1.0
+- If Avg 1BR Rent <= 100% of user budget: 0.9
+- If Avg 1BR Rent <= 110% of user budget: 0.65
+- If Avg 1BR Rent <= 125% of user budget: 0.35
+- If Avg 1BR Rent > 125% of user budget: 0.1
+
+Apply penalties:
+- 0–5% over budget: -2 points
+- 5–10% over budget: -5 points
+- 10–20% over budget: -12 points
+- More than 20% over budget: -25 points or exclude from top 5 unless there are not enough results
+
+Final Budget Score formula:
+Budget Score =
+0.75 × Rent Fit
++ 0.15 × Affordability normalized
++ 0.10 × Affordability Score normalized
+
+If Affordability or Affordability Score is missing, use Rent Fit as the fallback.
+
+## User Weighting Logic
+
+The lifestyle sliders are importance weights, not direct scores.
+
+Use the following values:
+- Walkability importance
+- Transit importance
+- Nightlife importance
+- Safety importance
+- Fitness importance
+- Workplace importance
+
+If Pet = Yes:
+- Add Pet importance = 60
+
+If Pet = No:
+- Pet importance = 0
+
+Normalize weights:
+
+Normalized Weight = individual importance / total importance
+
+If all importance sliders are 0:
+Use default weights:
+- Walkability: 15
+- Transit: 15
+- Nightlife: 10
+- Safety: 25
+- Fitness: 10
+- Workplace: 25
+- Pet: 0 unless pet is yes
+
+## Final Score Formula
+
+Calculate:
+
+Weighted Lifestyle Fit =
+WalkabilityWeight × WalkabilityScore
++ TransitWeight × TransitScore
++ NightlifeWeight × NightlifeScore
++ SafetyWeight × SafetyScore
++ FitnessWeight × FitnessScore
++ WorkplaceWeight × WorkplaceScore
++ PetWeight × PetScore
+
+Final Score =
+0.25 × BudgetScore
++ 0.75 × WeightedLifestyleFit
+
+Then convert to percentage:
+
+Final Match Percentage = Final Score × 100 - Penalties
+
+Clamp final score between 0 and 100.
+
+## Additional Penalty Rules
+
+Safety penalty:
+If Safety importance >= 70 and Safety Score < 0.5:
+- subtract 10 points
+
+Transit penalty:
+If Transit importance >= 70 and Transit Score < 0.5:
+- subtract 10 points
+
+Walkability penalty:
+If Walkability importance >= 70 and Walkability Score < 0.5:
+- subtract 8 points
+
+Pet penalty:
+If Pet = Yes and Pet Score < 0.5:
+- subtract 8 points
+
+Workplace penalty:
+If Workplace importance >= 70 and Workplace Score < 0.5:
+- subtract 10 points
+
+## Top 5 Reranking
+
+After scoring all neighbourhoods:
+1. Sort by final score descending.
+2. Remove duplicate neighbourhood names if duplicates exist.
+3. Return top 5.
+4. Try to avoid returning five nearly identical neighbourhoods if possible.
+
+If multiple high-scoring neighbourhoods are very similar, try to label them differently:
+- Best Overall Match
+- Best Budget-Friendly Match
+- Best Commute Match
+- Best Lifestyle Match
+- Best Balanced Alternative
+
+## Explanation Generator
+
+For each recommended neighbourhood, generate a short explanation using the strongest matching categories.
+
+Example:
+
+If Walkability Score is high and Walkability importance is high:
+- Add: "strong walkability"
+
+If Transit Score is high and Transit importance is high:
+- Add: "reliable transit access"
+
+If Safety Score is high and Safety importance is high:
+- Add: "strong safety fit"
+
+If Fitness Score is high and Fitness importance is high:
+- Add: "good access to parks, gyms, or wellness amenities"
+
+If Nightlife Score is high and Nightlife importance is high:
+- Add: "active social and nightlife scene"
+
+If Workplace Score is high and Workplace importance is high:
+- Add: "convenient commute fit"
+
+If Budget Score is high:
+- Add: "fits your rent budget well"
+
+Also generate one tradeoff based on the weakest relevant score:
+- Low budget score: "May stretch your rent budget."
+- Low nightlife score: "May feel quieter socially."
+- Low safety score: "Safety perception may be a tradeoff."
+- Low transit score: "Transit access may be limited."
+- Low walkability score: "You may rely more on a car."
+- Low pet score: "May be less ideal for pets."
+- Low workplace score: "Commute may be less convenient."
+
+## UI Output Requirements
+
+Update the results UI so each top 5 result card shows:
+
+- Rank number
+- Neighbourhood name
+- Zone/Quadrant
+- Match percentage
+- Recommendation label
+- Why it matched
+- Main tradeoff
+- Key metrics:
+  - Avg 1BR Rent
+  - Walkability
+  - Transit access
+  - Safety perception
+  - Nightlife/social
+  - Fitness & Wellness
+  - Parks/green space if Pet = Yes
+  - Workplace fit
+
+## Important Implementation Notes
+
+- Do not hardcode neighbourhood recommendations.
+- Recommendations must be calculated dynamically from the dataset and user questionnaire answers.
+- Make sure the algorithm handles missing values safely.
+- Make sure currency values are parsed correctly.
+- Make sure all scores are normalized to 0–1 before combining.
+- Make sure final scores are clamped between 0 and 100.
+- Make sure duplicate neighbourhood names do not appear twice in the final top 5.
+- The system should be explainable and deterministic.
+
+## Desired Result
+
+When the user completes the lifestyle questionnaire, the app should calculate their personalized top 5 Calgary neighbourhoods using the dataset and show clear, trustworthy, explainable recommendations.
+
+The final product should feel like a smart neighbourhood matching engine, not just a basic filter.

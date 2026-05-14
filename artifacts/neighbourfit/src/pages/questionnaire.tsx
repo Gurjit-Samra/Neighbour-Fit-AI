@@ -489,6 +489,15 @@ export default function Questionnaire() {
                       <Label className="text-sm font-medium text-foreground">
                         How much do you value living near your work/school?
                       </Label>
+                      <div className="flex justify-center">
+                        <div className="w-20 h-20 rounded-full flex flex-col items-center justify-center shadow-lg" style={{ backgroundColor: "#00cc99" }}>
+                          <span className="text-3xl font-black leading-none text-white">{commuteImportance}</span>
+                          <span className="text-[10px] font-medium opacity-80 mt-0.5 text-white">/ 100</span>
+                        </div>
+                      </div>
+                      <p className="text-center text-sm font-medium text-foreground -mt-1">
+                        {commuteImportance <= 10 ? "Not at all important" : commuteImportance <= 30 ? "Slightly important" : commuteImportance <= 50 ? "Moderately important" : commuteImportance <= 70 ? "Very important" : commuteImportance <= 90 ? "Highly important" : "Essential"}
+                      </p>
                       <div className="relative py-1">
                         <input
                           type="range"
