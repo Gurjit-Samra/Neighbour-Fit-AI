@@ -428,32 +428,6 @@ export default function Results() {
                   </div>
                 )}
 
-                {/* ── Dimension bars ── */}
-                {selected?.dimensionBreakdown?.length > 0 && (
-                  <div className="px-5 py-4 border-b border-slate-800">
-                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Dimension Breakdown</h3>
-                    <div className="space-y-2.5">
-                      {(selected.dimensionBreakdown as any[]).map((d: any) => {
-                        const pct = Math.round((d.score / 5) * 100);
-                        return (
-                          <div key={d.dimension}>
-                            <div className="flex justify-between text-xs mb-1">
-                              <span className="text-slate-300">{dimLabel(d.dimension)}</span>
-                              <span className="text-slate-500 tabular-nums">{pct}/100</span>
-                            </div>
-                            <div className="h-1.5 rounded-full bg-slate-700/80 overflow-hidden">
-                              <div
-                                className={cn("h-full rounded-full", dimColor(d.dimension))}
-                                style={{ width: `${pct}%` }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
                 {/* ── AI Lifestyle Insight ── */}
                 {selected?.aiSummary && !selected?.aiSummaryError && (
                   <div className="px-5 py-4 border-b border-slate-800">
