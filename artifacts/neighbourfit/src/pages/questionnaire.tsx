@@ -4,9 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { saveQuestionnaire } from "@/lib/questionnaire-store";
-import { CALGARY_NEIGHBORHOODS } from "@/lib/utils";
 import {
   ArrowRight,
   ArrowLeft,
@@ -231,6 +229,7 @@ export default function Questionnaire() {
 
   // Step 7
   const [workplace, setWorkplace] = useState<string>("none");
+  const [commuteImportance, setCommuteImportance] = useState(50);
 
   const theme = STEP_THEMES[step];
   const progressPct = ((step + 1) / TOTAL_STEPS) * 100;
@@ -251,18 +250,21 @@ export default function Questionnaire() {
 
   const handleSubmit = () => {
     const effectivePet = hasPet === false ? 0 : petFriendliness;
+    const isRemote = workplace === "none";
+    const effectiveTransit = isRemote ? transit : Math.min(100, transit + Math.round(commuteImportance * 0.4));
     saveQuestionnaire({
       budget,
       weights: {
         affordability: 20,
         walkability,
-        transit,
+        transit: effectiveTransit,
         nightlife,
         safety,
         fitness,
         petFriendliness: effectivePet,
       },
-      workplaceNeighborhood: workplace === "none" ? null : workplace,
+      workplaceNeighborhood: isRemote ? null : workplace,
+      commuteImportance: isRemote ? 0 : commuteImportance,
       usedDefaultWeights: false,
     });
     setLocation("/results");
@@ -450,43 +452,76 @@ export default function Questionnaire() {
 
               {/* ── Step 7: Workplace ─────────────────────────── */}
               {step === 7 && (
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Where do you work or study? (optional)</Label>
-                    <p className="text-xs text-muted-foreground">Only a general area is collected — no precise address needed.</p>
-                    <Select value={workplace} onValueChange={setWorkplace}>
-                      <SelectTrigger data-testid="workplace-select" className="bg-background">
-                        <SelectValue placeholder="Select or skip" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Prefer not to say / remote</SelectItem>
-                        <SelectItem value="Downtown Core">Downtown Core</SelectItem>
-                        <SelectItem value="Beltline">Beltline</SelectItem>
-                        <SelectItem value="University of Calgary">University of Calgary</SelectItem>
-                        <SelectItem value="SAIT">SAIT</SelectItem>
-                        <SelectItem value="SE/NE Industrial">Southeast / Northeast Industrial</SelectItem>
-                        {CALGARY_NEIGHBORHOODS.filter(
-                          (n) => !["Downtown Core", "Beltline"].includes(n)
-                        ).map((n) => (
-                          <SelectItem key={n} value={n}>{n}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {workplace === "none" || workplace === "" ? (
-                      <div className={cn("p-3 rounded-lg border text-xs flex items-start gap-2", theme.infoBg, theme.infoBorder, theme.infoText)}>
-                        <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                        Commute estimates assume a downtown Calgary destination. For other workplaces, use Google Maps.
-                      </div>
-                    ) : workplace === "Work From Home" ? (
-                      <div className={cn("p-3 rounded-lg border text-xs", theme.infoBg, theme.infoBorder, theme.infoText)}>
-                        Working from home means you have maximum flexibility — we'll focus entirely on lifestyle fit.
-                      </div>
-                    ) : (
-                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-xs text-green-800">
-                        We'll show commute estimates relative to <strong>{workplace}</strong>.
-                      </div>
-                    )}
+                <div className="space-y-5">
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-foreground">Where do you work or study?</Label>
+                    <p className="text-xs text-muted-foreground">Only a general area — no precise address needed.</p>
+                    <div className="flex flex-wrap gap-2">
+                      {(
+                        [
+                          { label: "NW", value: "Northwest Calgary" },
+                          { label: "NE", value: "Northeast Calgary" },
+                          { label: "SE", value: "Southeast Calgary" },
+                          { label: "SW", value: "Southwest Calgary" },
+                          { label: "Downtown", value: "Downtown Core" },
+                          { label: "Remote / Irrelevant", value: "none" },
+                        ] as const
+                      ).map(({ label, value }) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setWorkplace(value)}
+                          className={cn(
+                            "px-4 py-2 rounded-full text-sm font-medium border transition-all",
+                            workplace === value
+                              ? "border-[#00cc99] bg-[#00cc99]/15 text-[#00cc99]"
+                              : "border-slate-600 bg-slate-800 text-slate-300 hover:border-slate-400 hover:text-slate-100"
+                          )}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  {workplace !== "none" && (
+                    <div className="space-y-3 pt-1">
+                      <Label className="text-sm font-medium text-foreground">
+                        How much do you value living near your work/school?
+                      </Label>
+                      <div className="relative py-1">
+                        <input
+                          type="range"
+                          min={0}
+                          max={100}
+                          step={1}
+                          value={commuteImportance}
+                          onChange={(e) => setCommuteImportance(Number(e.target.value))}
+                          className="w-full h-2 rounded-full appearance-none cursor-pointer focus:outline-none"
+                          style={{
+                            accentColor: "#00cc99",
+                            background: `linear-gradient(to right, #00cc99 ${commuteImportance}%, #334155 ${commuteImportance}%)`,
+                          }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Not important</span>
+                        <span>Very important</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {workplace === "none" ? (
+                    <div className={cn("p-3 rounded-lg border text-xs flex items-start gap-2", theme.infoBg, theme.infoBorder, theme.infoText)}>
+                      <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                      Working remotely or commute isn't a factor — we'll focus entirely on lifestyle fit.
+                    </div>
+                  ) : workplace !== "" && (
+                    <div className={cn("p-3 rounded-lg border text-xs flex items-start gap-2", theme.infoBg, theme.infoBorder, theme.infoText)}>
+                      <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                      Commute estimates assume a downtown Calgary destination. For other workplaces, use Google Maps.
+                    </div>
+                  )}
                 </div>
               )}
 

@@ -10,6 +10,7 @@ export interface QuestionnaireData {
     petFriendliness: number;
   };
   workplaceNeighborhood: string | null;
+  commuteImportance?: number;
   usedDefaultWeights: boolean;
 }
 
