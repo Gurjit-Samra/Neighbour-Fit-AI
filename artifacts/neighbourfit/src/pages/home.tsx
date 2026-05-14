@@ -65,6 +65,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Community carousel */}
+      <CommunityCarousel />
+
       {/* How it works */}
       <section className="py-20 px-4">
         <div className="max-w-5xl mx-auto">
@@ -90,9 +93,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Community carousel */}
-      <CommunityCarousel />
 
       {/* CTA */}
       <section className="py-24 px-4">
