@@ -109,6 +109,9 @@ export interface NeighborhoodDetail {
   lifestyleTags: string[];
   /** @nullable */
   lastReviewedDate?: string | null;
+  /** @nullable */
+  aiSummary?: string | null;
+  aiSummaryError: boolean;
 }
 
 export interface NeighborhoodAdmin {

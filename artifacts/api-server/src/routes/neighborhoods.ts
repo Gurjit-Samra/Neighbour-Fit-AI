@@ -2,7 +2,9 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { neighborhoodsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import { makeOpenAIClient } from "../lib/ai-summary";
+import { makeOpenAIClient, getAiSummary } from "../lib/ai-summary";
+import { NEIGHBOURHOODS } from "../lib/neighbourhood-data";
+import { DEFAULT_WEIGHTS } from "../lib/scoring";
 
 const router = Router();
 
@@ -41,7 +43,18 @@ router.get("/neighborhoods/:slug", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Neighborhood not found" });
     return;
   }
-  res.json(serializeNeighborhood(n));
+
+  const csvNeighbourhood = NEIGHBOURHOODS.find((nb) => nb.slug === n.slug);
+  let aiSummary: string | null = null;
+  let aiSummaryError = false;
+
+  if (csvNeighbourhood) {
+    const result = await getAiSummary(csvNeighbourhood, DEFAULT_WEIGHTS);
+    aiSummary = result.summary;
+    aiSummaryError = result.error;
+  }
+
+  res.json({ ...serializeNeighborhood(n), aiSummary, aiSummaryError });
 });
 
 router.post("/neighborhoods/compare-summary", async (req, res): Promise<void> => {

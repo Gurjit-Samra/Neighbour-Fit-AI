@@ -113,6 +113,8 @@ export const GetNeighborhoodResponse = zod.object({
   populationDensityClass: zod.string(),
   lifestyleTags: zod.array(zod.string()),
   lastReviewedDate: zod.string().nullish(),
+  aiSummary: zod.string().nullish(),
+  aiSummaryError: zod.boolean(),
 });
 
 /**
@@ -377,6 +379,8 @@ export const CompareNeighborhoodsResponseItem = zod.object({
     populationDensityClass: zod.string(),
     lifestyleTags: zod.array(zod.string()),
     lastReviewedDate: zod.string().nullish(),
+    aiSummary: zod.string().nullish(),
+    aiSummaryError: zod.boolean(),
   }),
   strengths: zod.array(zod.string()),
   tradeoffs: zod.array(zod.string()),

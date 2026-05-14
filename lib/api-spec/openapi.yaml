@@ -697,6 +697,10 @@ components:
             type: string
         lastReviewedDate:
           type: ["string", "null"]
+        aiSummary:
+          type: ["string", "null"]
+        aiSummaryError:
+          type: boolean
       required:
         - id
         - name
@@ -712,6 +716,7 @@ components:
         - petFriendlinessScore
         - populationDensityClass
         - lifestyleTags
+        - aiSummaryError
 
     NeighborhoodAdmin:
       type: object
