@@ -35,29 +35,40 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="py-28 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-card text-muted-foreground border border-card-border mb-7 shadow-sm">
+      <section
+        className="relative py-36 px-4 overflow-hidden"
+        style={{
+          backgroundImage: "url('/calgary-hero.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center 40%",
+        }}
+      >
+        {/* Dark overlay for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-white/80 border border-white/20 mb-7 shadow-sm backdrop-blur-sm">
             Calgary Neighbourhood Matching
           </span>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-foreground leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-white leading-tight drop-shadow-lg">
             Find the neighbourhood<br />
-            <span className="text-primary">that fits how you live.</span>
+            <span style={{ color: "#00cc99" }}>that fits how you live.</span>
           </h1>
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-lg sm:text-xl text-white/75 max-w-2xl mx-auto mb-10 leading-relaxed drop-shadow">
             Answer a 2-minute questionnaire about your lifestyle priorities. NeighbourFit matches you against 200 Calgary communities and shows your top 5 — with an AI-written lifestyle insight for each.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/questionnaire">
               <button
-                className="flex items-center justify-center gap-2 px-8 py-3 bg-foreground text-background text-base font-semibold rounded-xl hover:opacity-90 active:opacity-80 transition-opacity shadow-sm"
+                className="flex items-center justify-center gap-2 px-8 py-3 text-white text-base font-semibold rounded-xl hover:opacity-90 active:opacity-80 transition-opacity shadow-lg"
+                style={{ backgroundColor: "#00cc99" }}
                 data-testid="cta-start"
               >
                 Find my neighbourhood <ArrowRight className="h-4 w-4" />
               </button>
             </Link>
             <Link href="/neighborhoods">
-              <button className="flex items-center justify-center gap-2 px-8 py-3 bg-card text-foreground text-base font-medium rounded-xl border border-card-border hover:shadow-sm transition-shadow">
+              <button className="flex items-center justify-center gap-2 px-8 py-3 text-white text-base font-medium rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors">
                 Browse all neighbourhoods
               </button>
             </Link>
