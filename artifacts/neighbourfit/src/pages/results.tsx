@@ -84,6 +84,30 @@ function dimColor(dim: string) {
   return map[dim] ?? "bg-slate-500";
 }
 
+const NEIGHBOURHOOD_IMAGES: Record<string, string> = {
+  beltline:            "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80&fit=crop&auto=format",
+  kensington:          "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80&fit=crop&auto=format",
+  mission:             "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80&fit=crop&auto=format",
+  inglewood:           "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80&fit=crop&auto=format",
+  bridgeland:          "https://images.unsplash.com/photo-1449844908441-8829872d2607?w=800&q=80&fit=crop&auto=format",
+  "east-village":      "https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=800&q=80&fit=crop&auto=format",
+  "marda-loop":        "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&q=80&fit=crop&auto=format",
+  sunnyside:           "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80&fit=crop&auto=format",
+  "university-district":"https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80&fit=crop&auto=format",
+  seton:               "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80&fit=crop&auto=format",
+};
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80&fit=crop&auto=format";
+
+function getNeighbourhoodImage(slug: string): string {
+  return NEIGHBOURHOOD_IMAGES[slug] ?? FALLBACK_IMAGE;
+}
+
+function getPriceRange(median: number): string {
+  const low  = Math.round((median * 0.85) / 50) * 50;
+  const high = Math.round((median * 1.15) / 50) * 50;
+  return `$${low.toLocaleString()}–$${high.toLocaleString()}/mo`;
+}
+
 export default function Results() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -493,61 +517,59 @@ export default function Results() {
           >
             {selectedNeighbourhood && (
               <>
-                {/* Header */}
-                <div className="px-5 py-5 border-b border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900">
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={cn(
-                          "text-[10px] font-bold px-2 py-0.5 rounded-sm",
-                          selectedIdx === 0 ? "bg-red-500 text-white" : "bg-teal-600 text-white"
-                        )}>
-                          #{selectedIdx + 1} MATCH
+                {/* ── Hero image header ── */}
+                <div className="relative h-52 flex-shrink-0 overflow-hidden">
+                  <img
+                    src={getNeighbourhoodImage(selectedNeighbourhood.slug)}
+                    alt={selectedNeighbourhood.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_IMAGE; }}
+                  />
+                  {/* Dark gradient overlay — transparent top → deep dark bottom */}
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 20%, rgba(15,23,42,0.92) 100%)" }}
+                  />
+                  {/* Overlaid content */}
+                  <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
+                    {/* Floating badges */}
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <span className="bg-teal-400 text-slate-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                        {selected?.compatibilityScore}% Lifestyle Fit
+                      </span>
+                      {selectedNeighbourhood.medianRentalEstimate && (
+                        <span className="border border-white/65 text-white text-xs font-medium px-3 py-1 rounded-full bg-black/25 backdrop-blur-sm">
+                          {getPriceRange(selectedNeighbourhood.medianRentalEstimate)}
                         </span>
-                        {selectedIdx === 0 && <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />}
-                      </div>
-                      <h2 className="text-2xl font-bold text-slate-100">{selectedNeighbourhood.name}</h2>
+                      )}
                     </div>
-                    <div className="text-right shrink-0">
-                      <div className={cn(
-                        "text-3xl font-black",
-                        selectedIdx === 0 ? "text-red-400" : "text-teal-400"
-                      )}>
-                        {selected?.compatibilityScore}%
+                    {/* Community name */}
+                    <h2 className="text-[2rem] font-bold text-white leading-none tracking-tight drop-shadow-md">
+                      {selectedNeighbourhood.name}
+                    </h2>
+                    {/* Commute row */}
+                    {selectedNeighbourhood.downtownCommuteEstimateMins && (
+                      <div className="flex items-center gap-1.5 mt-1.5 text-slate-300 text-sm">
+                        <MapPin className="h-3.5 w-3.5 shrink-0" />
+                        {selectedNeighbourhood.downtownCommuteEstimateMins} min to Downtown
                       </div>
-                      <div className="text-xs text-slate-400">lifestyle fit</div>
-                    </div>
+                    )}
                   </div>
+                </div>
 
-                  {/* Fit label */}
+                {/* Fit label + affordability warning strip */}
+                <div className="px-4 py-2.5 border-b border-slate-700 bg-slate-800/60 flex flex-wrap items-center gap-2">
                   <span className={cn(
                     "inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full border",
                     fitLabelColor(selected?.fitLabel ?? "")
                   )}>
                     {selected?.fitLabel}
                   </span>
-
-                  {/* Meta info row */}
-                  <div className="flex flex-wrap gap-3 mt-3 text-xs text-slate-400">
-                    {selectedNeighbourhood.downtownCommuteEstimateMins && (
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {selectedNeighbourhood.downtownCommuteEstimateMins} min to Downtown
-                      </span>
-                    )}
-                    {selectedNeighbourhood.medianRentalEstimate && (
-                      <span className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        ~${selectedNeighbourhood.medianRentalEstimate.toLocaleString()}/mo median
-                      </span>
-                    )}
-                  </div>
-
                   {selected?.affordabilityWarning && (
-                    <div className="mt-3 flex items-center gap-2 text-xs text-amber-400 bg-amber-950/50 border border-amber-800 rounded-lg px-3 py-2">
-                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                      Median rent may exceed your budget
-                    </div>
+                    <span className="flex items-center gap-1.5 text-xs text-amber-400 bg-amber-950/50 border border-amber-800 rounded-full px-2.5 py-1">
+                      <AlertTriangle className="h-3 w-3 shrink-0" />
+                      Rent may exceed your budget
+                    </span>
                   )}
                 </div>
 
