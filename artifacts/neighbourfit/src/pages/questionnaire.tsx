@@ -273,8 +273,17 @@ export default function Questionnaire() {
   const isLastStep = step === TOTAL_STEPS - 1;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col py-10 px-4">
-      <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
+    <div
+      className="min-h-screen flex flex-col py-10 px-4 relative"
+      style={{
+        backgroundImage: "url('/calgary-questionnaire.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center 40%",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <div className="absolute inset-0 bg-black/55 pointer-events-none" />
+      <div className="relative z-10 max-w-2xl mx-auto w-full flex-1 flex flex-col">
 
         {/* Header */}
         <div className="flex items-start justify-between mb-2">
