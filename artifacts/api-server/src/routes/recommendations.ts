@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { neighborhoodsTable, recommendationSessionsTable } from "@workspace/db";
+import { recommendationSessionsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { CreateRecommendationBody } from "@workspace/api-zod";
-import { rankNeighborhoods, normalizeWeights, DEFAULT_WEIGHTS } from "../lib/scoring";
+import { rankNeighborhoods, normalizeWeights, DEFAULT_WEIGHTS, deriveWorkplaceQuadrant } from "../lib/scoring";
 import { getAiSummary } from "../lib/ai-summary";
 import { trackEvent } from "../lib/analytics";
 import { requireAuth } from "../middlewares/auth";
@@ -32,47 +32,59 @@ router.post("/recommendations", async (req, res): Promise<void> => {
     userId: req.session?.userId ?? null,
   });
 
-  const neighborhoods = await db.select().from(neighborhoodsTable).orderBy(neighborhoodsTable.name);
-  const ranked = rankNeighborhoods(neighborhoods, effectiveWeights, budget);
+  const workplaceQuadrant = deriveWorkplaceQuadrant(workplaceNeighborhood);
+  const ranked = rankNeighborhoods(effectiveWeights, budget, workplaceQuadrant);
 
-  // Generate AI summaries in parallel
   const matchesWithAi = await Promise.all(
     ranked.map(async (match) => {
-      const { summary, error } = await getAiSummary(match.neighborhood, effectiveWeights);
+      const { summary, error } = await getAiSummary(match.neighbourhood, effectiveWeights);
       return { ...match, aiSummary: summary, aiSummaryError: error };
     })
   );
 
   const normalizedWeights = normalizeWeights(effectiveWeights);
 
-  // Serialize results
-  const results = matchesWithAi.map((m) => ({
-    neighborhood: {
-      id: m.neighborhood.id, name: m.neighborhood.name, slug: m.neighborhood.slug,
-      city: m.neighborhood.city, identity: m.neighborhood.identity,
-      description: m.neighborhood.description,
-      affordabilityScore: m.neighborhood.affordabilityScore,
-      walkabilityScore: m.neighborhood.walkabilityScore,
-      transitScore: m.neighborhood.transitScore,
-      nightlifeScore: m.neighborhood.nightlifeScore,
-      safetyScore: m.neighborhood.safetyScore,
-      fitnessScore: m.neighborhood.fitnessScore,
-      petFriendlinessScore: m.neighborhood.petFriendlinessScore,
-      medianRentalEstimate: m.neighborhood.medianRentalEstimate,
-      downtownCommuteEstimateMins: m.neighborhood.downtownCommuteEstimateMins,
-      populationDensityClass: m.neighborhood.populationDensityClass,
-      lifestyleTags: m.neighborhood.lifestyleTags,
-    },
-    compatibilityScore: m.compatibilityScore,
-    fitLabel: m.fitLabel,
-    aiSummary: m.aiSummary,
-    aiSummaryError: m.aiSummaryError,
-    affordabilityWarning: m.affordabilityWarning,
-    dimensionBreakdown: m.dimensionBreakdown,
-    tradeoffExplanation: m.tradeoffExplanation,
-  }));
+  const results = matchesWithAi.map((m) => {
+    const nb = m.neighbourhood;
+    return {
+      neighborhood: {
+        id: nb.index,
+        name: nb.name,
+        slug: nb.slug,
+        city: "Calgary",
+        identity: nb.communityVibe || nb.lifestyleIdentity || "",
+        description: nb.bestFor || "",
+        affordabilityScore: nb.affordabilityScore,
+        walkabilityScore: parseFloat((nb.walkability * 5).toFixed(1)),
+        transitScore: parseFloat((nb.transitAccess * 5).toFixed(1)),
+        nightlifeScore: parseFloat((nb.nightlife * 5).toFixed(1)),
+        safetyScore: parseFloat((nb.safetyPerception * 5).toFixed(1)),
+        fitnessScore: parseFloat((nb.fitnessWellness * 5).toFixed(1)),
+        petFriendlinessScore: parseFloat((nb.parksGreenSpace * 5).toFixed(1)),
+        medianRentalEstimate: nb.avg1BRRent,
+        downtownCommuteEstimateMins: null,
+        populationDensityClass: nb.density.toLowerCase(),
+        lifestyleTags: [nb.bestFor, nb.zone].filter(Boolean),
+        zone: nb.zone,
+        urbanForm: nb.urbanForm,
+        keyTradeoffs: nb.keyTradeoffs,
+        primaryMatchingDrivers: nb.primaryMatchingDrivers,
+      },
+      compatibilityScore: m.compatibilityScore,
+      fitLabel: m.fitLabel,
+      aiSummary: m.aiSummary,
+      aiSummaryError: m.aiSummaryError,
+      affordabilityWarning: m.affordabilityWarning,
+      dimensionBreakdown: m.dimensionBreakdown.map((d) => ({
+        dimension: d.label,
+        score: d.score,
+        weight: d.weight,
+        contribution: d.contribution,
+      })),
+      tradeoffExplanation: m.tradeoffExplanation,
+    };
+  });
 
-  // Save session if authenticated
   let sessionId: number | null = null;
   if (req.session?.userId) {
     const [saved] = await db.insert(recommendationSessionsTable).values({

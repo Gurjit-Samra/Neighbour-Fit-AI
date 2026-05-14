@@ -50,7 +50,7 @@ export default function Home() {
             <span className="text-primary">that fits how you live.</span>
           </h1>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            Answer a 2-minute questionnaire about your lifestyle priorities. NeighbourFit scores 10 Calgary communities and explains why each one works — or doesn't — for you.
+            Answer a 2-minute questionnaire about your lifestyle priorities. NeighbourFit matches you against 200 Calgary communities and shows your top 5 — with an AI-written lifestyle insight for each.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/questionnaire">
