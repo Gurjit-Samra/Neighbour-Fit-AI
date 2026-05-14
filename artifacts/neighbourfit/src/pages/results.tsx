@@ -420,31 +420,6 @@ export default function Results() {
                   )}
                 </div>
 
-                {/* ── Score overview grid ── */}
-                {selected?.dimensionBreakdown?.length > 0 && (
-                  <div className="px-5 py-4 border-b border-slate-800">
-                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Score Overview</h3>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                      {(selected.dimensionBreakdown as any[]).map((d: any) => {
-                        const pct = Math.round((d.score / 5) * 100);
-                        return (
-                          <div key={d.dimension} className="text-center p-2.5 bg-slate-800/60 rounded-xl">
-                            <div className={cn(
-                              "text-lg font-bold tabular-nums",
-                              selectedIdx === 0 ? "text-emerald-400" : "text-slate-300"
-                            )}>
-                              {pct}
-                            </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">
-                              {dimLabel(d.dimension)}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
                 {/* ── Radar chart ── */}
                 {radarData.length > 0 && (
                   <div className="px-5 py-4 border-b border-slate-800">
