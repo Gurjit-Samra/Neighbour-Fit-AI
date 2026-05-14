@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Sliders, Star, GitCompare, ArrowRight } from "lucide-react";
+import { CommunityCarousel } from "@/components/CommunityCarousel";
 
 const FEATURES = [
   {
@@ -29,12 +30,6 @@ const FEATURES = [
   },
 ];
 
-const NEIGHBORHOODS = [
-  { name: "Beltline", tag: "Urban nightlife hub", score: "Walkability" },
-  { name: "Kensington", tag: "Café culture & pets", score: "Pet-friendly" },
-  { name: "Marda Loop", tag: "Wellness & fitness", score: "Fitness" },
-  { name: "Inglewood", tag: "Arts & creativity", score: "Affordability" },
-];
 
 export default function Home() {
   return (
@@ -96,37 +91,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured neighbourhoods */}
-      <section className="py-20 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold mb-3 text-foreground">Featured neighbourhoods</h2>
-            <p className="text-muted-foreground">A taste of what you'll discover</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {NEIGHBORHOODS.map((n) => (
-              <Link key={n.name} href={`/neighborhoods/${n.name.toLowerCase().replace(/ /g, "-")}`}>
-                <Card className="bg-card border-card-border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer h-full">
-                  <CardContent className="pt-5 pb-5">
-                    <h3 className="font-bold text-base mb-1 text-foreground">{n.name}</h3>
-                    <p className="text-xs text-muted-foreground mb-3">{n.tag}</p>
-                    <span className="inline-block px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                      {n.score}
-                    </span>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-          <div className="text-center mt-10">
-            <Link href="/neighborhoods">
-              <button className="inline-flex items-center gap-2 px-6 py-2.5 bg-card text-foreground text-sm font-medium rounded-xl border border-card-border hover:shadow-sm transition-shadow">
-                Explore all neighbourhoods <ArrowRight className="h-4 w-4" />
-              </button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Community carousel */}
+      <CommunityCarousel />
 
       {/* CTA */}
       <section className="py-24 px-4">

@@ -10,6 +10,7 @@ import {
   useAskNeighbourhood,
 } from "@workspace/api-client-react";
 import { loadQuestionnaire } from "@/lib/questionnaire-store";
+import { getNeighbourhoodImage, FALLBACK_IMAGE } from "@/lib/neighbourhood-images";
 import { RadarChartComponent } from "@/components/neighborhood/RadarChart";
 import { Button } from "@/components/ui/button";
 import {
@@ -64,25 +65,6 @@ function dimColor(dim: string) {
     petFriendliness:"bg-amber-500",
   };
   return map[dim] ?? "bg-slate-500";
-}
-
-const NEIGHBOURHOOD_IMAGES: Record<string, string> = {
-  beltline:              "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80&fit=crop&auto=format",
-  kensington:            "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80&fit=crop&auto=format",
-  mission:               "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80&fit=crop&auto=format",
-  inglewood:             "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80&fit=crop&auto=format",
-  bridgeland:            "https://images.unsplash.com/photo-1449844908441-8829872d2607?w=800&q=80&fit=crop&auto=format",
-  "east-village":        "https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=800&q=80&fit=crop&auto=format",
-  "marda-loop":          "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&q=80&fit=crop&auto=format",
-  sunnyside:             "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80&fit=crop&auto=format",
-  "university-district": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80&fit=crop&auto=format",
-  seton:                 "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80&fit=crop&auto=format",
-};
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80&fit=crop&auto=format";
-
-function getNeighbourhoodImage(slug: string): string {
-  return NEIGHBOURHOOD_IMAGES[slug] ?? FALLBACK_IMAGE;
 }
 
 function getPriceRange(median: number): string {
