@@ -288,15 +288,15 @@ export default function Questionnaire() {
         {/* Header */}
         <div className="flex items-start justify-between mb-2">
           <div>
-            <h1 className="text-lg font-semibold text-foreground leading-tight">
+            <h1 className="text-lg font-semibold text-white leading-tight drop-shadow">
               Find Your Perfect Calgary Neighbourhood
             </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
+            <p className="text-sm text-white/70 mt-0.5">
               Step {step + 1} of {TOTAL_STEPS}: {STEP_LABELS[step]}
             </p>
           </div>
           <Link href="/">
-            <span className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer whitespace-nowrap ml-6 mt-0.5">
+            <span className="text-sm text-white/60 hover:text-white transition-colors cursor-pointer whitespace-nowrap ml-6 mt-0.5">
               Skip →
             </span>
           </Link>
