@@ -420,14 +420,6 @@ export default function Results() {
                   )}
                 </div>
 
-                {/* ── Radar chart ── */}
-                {radarData.length > 0 && (
-                  <div className="px-5 py-4 border-b border-slate-800">
-                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Lifestyle Radar</h3>
-                    <RadarChartComponent data={radarData} />
-                  </div>
-                )}
-
                 {/* ── AI Lifestyle Insight ── */}
                 {selected?.aiSummary && !selected?.aiSummaryError && (
                   <div className="px-5 py-4 border-b border-slate-800">
@@ -442,6 +434,14 @@ export default function Results() {
                       <p className="text-sm text-slate-300 leading-relaxed">{selected.aiSummary}</p>
                       <p className="text-[10px] text-slate-500 mt-2">Scores are curated estimates, not AI-generated.</p>
                     </div>
+                  </div>
+                )}
+
+                {/* ── Radar chart ── */}
+                {radarData.length > 0 && (
+                  <div className="px-5 py-4 border-b border-slate-800">
+                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Lifestyle Radar</h3>
+                    <RadarChartComponent data={radarData} />
                   </div>
                 )}
 
