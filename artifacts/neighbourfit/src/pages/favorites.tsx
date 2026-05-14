@@ -33,14 +33,18 @@ export default function Favorites() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-10 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div
+      className="min-h-screen py-10 px-4 relative"
+      style={{ backgroundImage: "url('/calgary-bg.png')", backgroundSize: "cover", backgroundPosition: "center 40%", backgroundAttachment: "fixed" }}
+    >
+      <div className="absolute inset-0 bg-black/55 pointer-events-none" />
+      <div className="relative z-10 max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
+            <h1 className="text-3xl font-bold flex items-center gap-2 text-white">
               <Heart className="h-7 w-7 text-primary fill-primary" /> Saved neighbourhoods
             </h1>
-            <p className="text-muted-foreground mt-1">{(favorites ?? []).length} saved</p>
+            <p className="text-white/70 mt-1">{(favorites ?? []).length} saved</p>
           </div>
           {compareSet.length >= 2 && (
             <Link href={`/compare?slugs=${compareSet.join(",")}`}>

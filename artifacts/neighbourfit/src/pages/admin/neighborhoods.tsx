@@ -117,12 +117,16 @@ export default function AdminNeighborhoods() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-10 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div
+      className="min-h-screen py-10 px-4 relative"
+      style={{ backgroundImage: "url('/calgary-bg.png')", backgroundSize: "cover", backgroundPosition: "center 40%", backgroundAttachment: "fixed" }}
+    >
+      <div className="absolute inset-0 bg-black/55 pointer-events-none" />
+      <div className="relative z-10 max-w-4xl mx-auto">
         <div className="mb-6">
-          <Link href="/admin"><Button variant="ghost" size="sm" className="gap-1 mb-4"><ArrowLeft className="h-4 w-4" />Admin</Button></Link>
-          <h1 className="text-3xl font-bold">Manage Neighbourhoods</h1>
-          <p className="text-muted-foreground mt-1">Edit scores, descriptions, and clear AI summary caches.</p>
+          <Link href="/admin"><Button variant="ghost" size="sm" className="gap-1 mb-4 text-white/80 hover:text-white hover:bg-white/10"><ArrowLeft className="h-4 w-4" />Admin</Button></Link>
+          <h1 className="text-3xl font-bold text-white">Manage Neighbourhoods</h1>
+          <p className="text-white/70 mt-1">Edit scores, descriptions, and clear AI summary caches.</p>
         </div>
 
         <div className="space-y-3">

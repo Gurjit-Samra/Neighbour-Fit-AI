@@ -27,11 +27,15 @@ export default function Dashboard() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-background py-10 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div
+      className="min-h-screen py-10 px-4 relative"
+      style={{ backgroundImage: "url('/calgary-bg.png')", backgroundSize: "cover", backgroundPosition: "center 40%", backgroundAttachment: "fixed" }}
+    >
+      <div className="absolute inset-0 bg-black/55 pointer-events-none" />
+      <div className="relative z-10 max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground mt-1 flex items-center gap-1">
+          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+          <p className="text-white/70 mt-1 flex items-center gap-1">
             <User className="h-4 w-4" />{user.email}
           </p>
         </div>

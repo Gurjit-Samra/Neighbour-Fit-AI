@@ -36,16 +36,20 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-12 relative"
+      style={{ backgroundImage: "url('/calgary-bg.png')", backgroundSize: "cover", backgroundPosition: "center 40%", backgroundAttachment: "fixed" }}
+    >
+      <div className="absolute inset-0 bg-black/55 pointer-events-none" />
+      <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-3">
             <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
               <MapPin className="h-5 w-5 text-primary-foreground" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold">Welcome back</h1>
-          <p className="text-muted-foreground text-sm mt-1">Sign in to your NeighbourFit account</p>
+          <h1 className="text-2xl font-bold text-white">Welcome back</h1>
+          <p className="text-white/70 text-sm mt-1">Sign in to your NeighbourFit account</p>
         </div>
 
         <Card>
