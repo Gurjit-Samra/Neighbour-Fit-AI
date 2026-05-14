@@ -103,7 +103,7 @@ export default function Home() {
         </div>
       </section>
       {/* CTA */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 pt-[50px] pb-[50px]">
         <div className="max-w-2xl mx-auto">
           <div className="bg-card rounded-2xl border border-card-border shadow-lg p-12 text-center">
             <h2 className="text-3xl font-bold mb-4 text-foreground">Ready to find your fit?</h2>
