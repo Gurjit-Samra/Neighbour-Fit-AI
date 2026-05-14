@@ -103,6 +103,7 @@ export default function Results() {
   const [selectedIdx, setSelectedIdx]         = useState(0);
   const [followUpQuestion, setFollowUpQuestion] = useState("");
   const [followUpAnswer, setFollowUpAnswer]     = useState<string | null>(null);
+  const [aiExpanded, setAiExpanded]             = useState(false);
   const submitted      = useRef(false);
   const askNeighbourhood = useAskNeighbourhood();
 
@@ -189,6 +190,7 @@ export default function Results() {
     setSelectedIdx(idx);
     setFollowUpQuestion("");
     setFollowUpAnswer(null);
+    setAiExpanded(false);
     askNeighbourhood.reset();
   };
 
@@ -431,7 +433,41 @@ export default function Results() {
                         )} />
                         <h3 className="text-sm font-semibold text-slate-100">Lifestyle insight</h3>
                       </div>
-                      <p className="text-sm text-slate-300 leading-relaxed">{selected.aiSummary}</p>
+
+                      {/* Collapsed / expanded text */}
+                      <div
+                        style={{
+                          maxHeight: aiExpanded ? "600px" : "72px",
+                          transition: "max-height 0.35s ease-in-out",
+                        }}
+                        className="overflow-hidden"
+                      >
+                        <p
+                          className="text-sm text-slate-300 leading-relaxed"
+                          style={
+                            aiExpanded
+                              ? undefined
+                              : {
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: 3,
+                                  WebkitBoxOrient: "vertical",
+                                  overflow: "hidden",
+                                }
+                          }
+                        >
+                          {selected.aiSummary}
+                        </p>
+                      </div>
+
+                      {/* Expand / Hide toggle */}
+                      <button
+                        onClick={() => setAiExpanded((v) => !v)}
+                        className="mt-2 text-xs font-medium transition-opacity hover:opacity-75"
+                        style={{ color: "#00cc99", background: "none", border: "none", padding: 0, cursor: "pointer" }}
+                      >
+                        {aiExpanded ? "Hide" : "Expand"}
+                      </button>
+
                       <p className="text-[10px] text-slate-500 mt-2">Scores are curated estimates, not AI-generated.</p>
                     </div>
                   </div>
