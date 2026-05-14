@@ -171,7 +171,7 @@ export function CommunityCarousel() {
   const doubled = [...displayCards, ...displayCards];
 
   return (
-    <section className="py-20 overflow-hidden">
+    <section className="py-20 overflow-hidden pt-[50px] pb-[50px]">
       {/* Section header */}
       <div className="max-w-5xl mx-auto px-4 mb-10">
         <div className="text-center">
@@ -179,7 +179,6 @@ export function CommunityCarousel() {
           <p className="text-muted-foreground">Hover to preview · Click to explore</p>
         </div>
       </div>
-
       {/* Carousel track */}
       <div
         className="relative"
@@ -227,7 +226,6 @@ export function CommunityCarousel() {
           ))}
         </motion.div>
       </div>
-
       {/* Browse CTA */}
       <div className="text-center mt-10">
         <Link href="/neighborhoods">

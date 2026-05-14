@@ -36,7 +36,7 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero */}
       <section
-        className="relative py-36 px-4 overflow-hidden"
+        className="relative py-36 px-4 overflow-hidden bg-transparent"
         style={{
           backgroundImage: "url('/calgary-hero.png')",
           backgroundSize: "cover",
@@ -75,12 +75,10 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Community carousel */}
       <CommunityCarousel />
-
       {/* How it works */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 text-[#151d28] pt-[10px] pb-[10px]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold mb-3 text-foreground">How it works</h2>
@@ -104,7 +102,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* CTA */}
       <section className="py-24 px-4">
         <div className="max-w-2xl mx-auto">
