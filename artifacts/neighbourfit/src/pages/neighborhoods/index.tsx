@@ -21,7 +21,7 @@ export default function NeighborhoodsIndex() {
       <div className="max-w-5xl mx-auto">
         <div className="mb-10">
           <h1 className="text-3xl font-bold mb-2 text-foreground">Calgary Neighbourhoods</h1>
-          <p className="text-muted-foreground">All 10 communities scored across 7 lifestyle dimensions.</p>
+          <p className="text-muted-foreground">All Calgary communities scored across 7 lifestyle dimensions.</p>
         </div>
 
         <div className="mb-8 relative max-w-sm">

@@ -68,4 +68,4 @@ Find the Calgary neighbourhood that fits how you actually live — a full-stack 
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
-- 10 Calgary neighbourhoods are seeded: Beltline, Kensington, Mission, Inglewood, Bridgeland, East Village, Marda Loop, Sunnyside, University District, Seton
+- Calgary neighbourhoods are seeded from the database; the full set of communities is managed via the admin dashboard or direct DB inserts

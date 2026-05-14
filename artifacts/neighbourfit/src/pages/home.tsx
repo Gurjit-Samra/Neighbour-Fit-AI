@@ -121,7 +121,7 @@ export default function Home() {
           <div className="text-center mt-10">
             <Link href="/neighborhoods">
               <button className="inline-flex items-center gap-2 px-6 py-2.5 bg-card text-foreground text-sm font-medium rounded-xl border border-card-border hover:shadow-sm transition-shadow">
-                See all 10 neighbourhoods <ArrowRight className="h-4 w-4" />
+                Explore all neighbourhoods <ArrowRight className="h-4 w-4" />
               </button>
             </Link>
           </div>
