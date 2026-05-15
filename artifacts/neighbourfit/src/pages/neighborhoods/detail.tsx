@@ -7,7 +7,9 @@ import {
   useAddFavorite,
   useRemoveFavorite,
   useAskNeighbourhood,
+  getListFavoritesQueryKey,
 } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { ScoreBar } from "@/components/neighborhood/ScoreBar";
 import { COMMUTE_DISCLAIMER, getDensityLabel } from "@/lib/utils";
@@ -41,6 +43,7 @@ export default function NeighborhoodDetail() {
   const { data: favorites } = useListFavorites({ query: { enabled: !!user } });
   const addFav    = useAddFavorite();
   const removeFav = useRemoveFavorite();
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   const askNeighbourhood = useAskNeighbourhood();
 
@@ -72,8 +75,27 @@ export default function NeighborhoodDetail() {
 
   const toggleFavorite = () => {
     if (!user) { toast({ title: "Sign in required", description: "Create a free account to save favourites." }); return; }
-    if (isFavorite) removeFav.mutate({ neighborhoodId: String(n.id) });
-    else addFav.mutate({ neighborhoodId: String(n.id) });
+    const queryKey = getListFavoritesQueryKey();
+    const previous = queryClient.getQueryData(queryKey);
+    if (isFavorite) {
+      queryClient.setQueryData(queryKey, (old: any[]) => (old ?? []).filter((f: any) => f.id !== n.id));
+      removeFav.mutate(
+        { neighborhoodId: n.id },
+        {
+          onError: () => queryClient.setQueryData(queryKey, previous),
+          onSettled: () => queryClient.invalidateQueries({ queryKey }),
+        }
+      );
+    } else {
+      queryClient.setQueryData(queryKey, (old: any[]) => [...(old ?? []), { ...n }]);
+      addFav.mutate(
+        { neighborhoodId: n.id },
+        {
+          onError: () => queryClient.setQueryData(queryKey, previous),
+          onSettled: () => queryClient.invalidateQueries({ queryKey }),
+        }
+      );
+    }
   };
 
   const handleAsk = () => {

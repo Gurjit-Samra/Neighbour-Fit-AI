@@ -60,24 +60,29 @@ export default function NeighborhoodsIndex() {
       });
       return;
     }
+    const queryKey = getListFavoritesQueryKey();
+    const previous = queryClient.getQueryData(queryKey);
     if (favoriteIds.has(n.id)) {
+      queryClient.setQueryData(queryKey, (old: any[]) =>
+        (old ?? []).filter((f: any) => f.id !== n.id)
+      );
       removeFav.mutate(
         { neighborhoodId: n.id },
         {
-          onSuccess: () =>
-            queryClient.invalidateQueries({
-              queryKey: getListFavoritesQueryKey(),
-            }),
+          onError: () => queryClient.setQueryData(queryKey, previous),
+          onSettled: () => queryClient.invalidateQueries({ queryKey }),
         }
       );
     } else {
+      queryClient.setQueryData(queryKey, (old: any[]) => [
+        ...(old ?? []),
+        { ...n },
+      ]);
       addFav.mutate(
         { neighborhoodId: n.id },
         {
-          onSuccess: () =>
-            queryClient.invalidateQueries({
-              queryKey: getListFavoritesQueryKey(),
-            }),
+          onError: () => queryClient.setQueryData(queryKey, previous),
+          onSettled: () => queryClient.invalidateQueries({ queryKey }),
         }
       );
     }
@@ -145,8 +150,8 @@ export default function NeighborhoodsIndex() {
               const isSaved = favoriteIds.has(n.id);
               const inQueue = compareQueue.includes(n.slug);
               const isMutating =
-                (addFav.isPending || removeFav.isPending) &&
-                (addFav.variables as any)?.neighborhoodId === String(n.id);
+                (addFav.isPending && addFav.variables?.neighborhoodId === n.id) ||
+                (removeFav.isPending && removeFav.variables?.neighborhoodId === n.id);
 
               return (
                 <div
