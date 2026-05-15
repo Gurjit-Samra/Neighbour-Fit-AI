@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { ReportCheckoutModal } from "@/components/report/ReportCheckoutModal";
 import { useLocation, Link } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -29,6 +30,7 @@ import {
   Sparkles,
   SendHorizontal,
   MessageCircle,
+  FileText,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -86,6 +88,7 @@ export default function Results() {
   const [followUpQuestion, setFollowUpQuestion] = useState("");
   const [followUpAnswer, setFollowUpAnswer]     = useState<string | null>(null);
   const [aiExpanded, setAiExpanded]             = useState(false);
+  const [showReport, setShowReport]             = useState(false);
   const submitted      = useRef(false);
   const askNeighbourhood = useAskNeighbourhood();
 
@@ -324,6 +327,16 @@ export default function Results() {
               </button>
             </Link>
           )}
+          <button
+            onClick={() => setShowReport(true)}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-colors border"
+            style={{ backgroundColor: "#00cc9915", borderColor: "#00cc9940", color: "#00cc99" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#00cc9925"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#00cc9915"; }}
+          >
+            <FileText className="h-3.5 w-3.5" />
+            Get Report — $3.00
+          </button>
           <Link href="/questionnaire">
             <button className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition-colors border border-slate-700">
               <RefreshCw className="h-3.5 w-3.5" />
@@ -582,6 +595,12 @@ export default function Results() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      <ReportCheckoutModal
+        open={showReport}
+        onClose={() => setShowReport(false)}
+        matches={matches}
+      />
     </div>
   );
 }
