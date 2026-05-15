@@ -486,7 +486,7 @@ const handleNeighborhoodClick = (neighborhood: NeighborhoodData) => {
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
+const MAPBOX_TOKEN = "YOUR_MAPBOX_TOKEN_HERE";
 // For production: Use import.meta.env.VITE_MAPBOX_TOKEN
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
