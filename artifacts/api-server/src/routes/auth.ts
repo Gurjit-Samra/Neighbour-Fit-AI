@@ -86,11 +86,16 @@ router.post("/auth/login", async (req, res): Promise<void> => {
   });
 });
 
-router.post("/auth/logout", async (req, res): Promise<void> => {
+router.post("/auth/logout", (req, res): void => {
   req.session.destroy((err) => {
-    if (err) req.log.error({ err }, "Session destroy error");
+    if (err) {
+      req.log.error({ err }, "Session destroy error");
+      res.status(500).json({ error: "Logout failed" });
+      return;
+    }
+    res.clearCookie("connect.sid");
+    res.json({ success: true, message: "Logged out" });
   });
-  res.json({ success: true, message: "Logged out" });
 });
 
 router.get("/auth/me", async (req, res): Promise<void> => {
