@@ -54,9 +54,7 @@ export default function Home() {
             Find the neighbourhood<br />
             <span style={{ color: "#00cc99" }}>that fits how you live.</span>
           </h1>
-          <p className="text-lg sm:text-xl text-white/75 max-w-2xl mx-auto mb-10 leading-relaxed drop-shadow">
-            Answer a 2-minute questionnaire about your lifestyle priorities. NeighbourFit matches you against 200 Calgary communities and shows your top 5 — with an AI-written lifestyle insight for each.
-          </p>
+          <p className="text-lg sm:text-xl text-white/75 max-w-2xl mx-auto mb-10 leading-relaxed drop-shadow">Answer a 2-minute questionnaire about your lifestyle priorities. NeighbourFit matches you against 200+ Calgary communities and shows your top 5 — with an AI-written lifestyle insight for each.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/questionnaire">
               <button
