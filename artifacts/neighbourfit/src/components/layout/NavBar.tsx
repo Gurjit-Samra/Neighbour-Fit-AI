@@ -16,7 +16,8 @@ export function NavBar() {
   const handleLogout = () => {
     logout.mutate(undefined, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
+        queryClient.setQueryData(getGetMeQueryKey(), null);
+        queryClient.removeQueries({ queryKey: getGetMeQueryKey() });
         setLocation("/");
       },
     });
