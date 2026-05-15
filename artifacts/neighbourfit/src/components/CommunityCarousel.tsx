@@ -229,9 +229,7 @@ export function CommunityCarousel() {
       {/* Browse CTA */}
       <div className="text-center mt-10">
         <Link href="/neighborhoods">
-          <button className="inline-flex items-center gap-2 px-6 py-2.5 bg-card text-foreground text-sm font-medium rounded-xl border border-card-border hover:shadow-sm transition-shadow">
-            Explore all 200 neighbourhoods →
-          </button>
+          <button className="inline-flex items-center gap-2 px-6 py-2.5 bg-card text-foreground text-sm font-medium rounded-xl border border-card-border hover:shadow-sm transition-shadow">Explore 200+ Neighbourhoods →</button>
         </Link>
       </div>
     </section>
