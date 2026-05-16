@@ -1,0 +1,14 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "dqaYUtDPVXIvHH2jAyj69"
+uri = "file://README.md"
+type = "text"
+title = "README.md"
+
+[[outputs]]
+id = "qLGQMiZbFXZzDiQILDfwU"
+uri = "file://docs/DOCUMENTATION.md"
+type = "text"
+title = "docs/DOCUMENTATION.md"
