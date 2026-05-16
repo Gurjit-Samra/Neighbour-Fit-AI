@@ -477,115 +477,6 @@ const handleNeighborhoodClick = (neighborhood: NeighborhoodData) => {
 
 ---
 
-## Center Section: The Live Map
-
-### Mapbox GL JS Setup
-
-**Initialization**:
-```typescript
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-
-const MAPBOX_TOKEN = "YOUR_MAPBOX_TOKEN_HERE";
-// For production: Use import.meta.env.VITE_MAPBOX_TOKEN
-
-mapboxgl.accessToken = MAPBOX_TOKEN;
-
-useEffect(() => {
-  if (!mapContainer.current || map.current) return;
-
-  map.current = new mapboxgl.Map({
-    container: mapContainer.current,
-    style: "mapbox://styles/mapbox/outdoors-v12",
-    center: [-114.0719, 51.0447], // Calgary downtown
-    zoom: 11.5,
-  });
-
-  map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
-
-  return () => {
-    map.current?.remove();
-    map.current = null;
-  };
-}, []);
-```
-
-### Custom Markers
-
-**#1 Match (Red Star)**:
-```typescript
-const createStarMarker = () => {
-  const el = document.createElement("div");
-  el.className = "custom-marker";
-  el.style.width = "40px";
-  el.style.height = "40px";
-  el.innerHTML = `
-    <svg width="40" height="40" viewBox="0 0 40 40">
-      <circle cx="20" cy="20" r="18" fill="#ef4444" stroke="white" stroke-width="3"/>
-      <path d="M20 12l2.5 5.5 6 .9-4.4 4.3 1 6.3-5.1-2.7-5.1 2.7 1-6.3-4.4-4.3 6-.9z" fill="white"/>
-    </svg>
-  `;
-  return el;
-};
-```
-
-**Others (Teal Pin)**:
-```typescript
-const createPinMarker = () => {
-  const el = document.createElement("div");
-  el.className = "custom-marker";
-  el.style.width = "40px";
-  el.style.height = "40px";
-  el.innerHTML = `
-    <svg width="40" height="40" viewBox="0 0 40 40">
-      <path d="M20 5c-6.6 0-12 5.4-12 12 0 9 12 18 12 18s12-9 12-18c0-6.6-5.4-12-12-12z" 
-            fill="#14b8a6" stroke="white" stroke-width="2"/>
-      <circle cx="20" cy="17" r="4" fill="white"/>
-    </svg>
-  `;
-  return el;
-};
-```
-
-**Adding Markers**:
-```typescript
-CALGARY_NEIGHBORHOODS.forEach((neighborhood, index) => {
-  const el = index === 0 ? createStarMarker() : createPinMarker();
-  
-  const marker = new mapboxgl.Marker(el)
-    .setLngLat(neighborhood.coordinates)
-    .addTo(map.current!);
-  
-  el.addEventListener("click", () => {
-    setSelectedNeighborhood(neighborhood);
-    map.current?.flyTo({
-      center: neighborhood.coordinates,
-      zoom: 13,
-      duration: 1500,
-    });
-  });
-  
-  markers.current.push(marker);
-});
-```
-
-### Map Footer Overlay
-
-```tsx
-<div className="absolute bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-sm 
-                text-slate-300 text-xs p-3 border-t border-slate-700">
-  <div className="flex items-center gap-2">
-    <Navigation className="h-3 w-3" />
-    <span>
-      Commute estimate assumes a downtown Calgary destination. 
-      Source: City of Calgary Open Data.
-    </span>
-  </div>
-</div>
-```
-
----
-
 ## Right Sidebar: The Deep Dive
 
 ### Hero Image Section
@@ -1179,7 +1070,6 @@ async function generateNeighborhoodSummary(
 
 Create `.env` file:
 ```
-VITE_MAPBOX_TOKEN=pk.eyJ1IjoieW91ci11c2VybmFtZSIsImEiOiJjbGhqNXNsZGswMTBl...
 ```
 
 **Security**:
