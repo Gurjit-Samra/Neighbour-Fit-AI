@@ -4,22 +4,7 @@
 
 NeighbourFit AI is a full-stack lifestyle matching web app that helps people discover the right Calgary community based on their priorities — budget, walkability, transit, nightlife, safety, fitness access, and more. A deterministic scoring engine ranks neighbourhoods; OpenAI generates personalised narrative summaries.
 
----
 
-## About This Project
-
-NeighbourFit AI was developed as part of the **ENTI 333/633 Block Week course** at the **University of Calgary**, Haskayne School of Business. The project was built over a concentrated block week sprint, combining entrepreneurial thinking with full-stack software development to produce a working, deployable product.
-
-### Team
-
-| Name | Stream |
-|---|---|
-| Simrat Dhillon | Graduate |
-| Iteoluwakisi Adejuwon | Graduate |
-| Rethika Rajeev | Graduate |
-| Mariesa Cummings | Graduate |
-| Gurjit Samra | Undergraduate |
-| Derrick Martin | Undergraduate |
 
 ---
 
@@ -28,7 +13,7 @@ NeighbourFit AI was developed as part of the **ENTI 333/633 Block Week course** 
 - **8-step questionnaire** — monthly budget slider, 7 priority sliders, workplace location selector, and a review step
 - **Ranked results** — top 5 neighbourhood matches scored by weighted compatibility, with fit labels and affordability warnings
 - **AI lifestyle insights** — GPT-4o-mini narrative summaries per match, cached in PostgreSQL for 24 hours
-- **Neighbourhood browser** — searchable, filterable grid of all 10 Calgary communities
+- **Neighbourhood browser** — searchable, filterable grid of all Calgary communities
 - **Side-by-side comparison** — compare 2–3 neighbourhoods across every scored dimension
 - **Favourites** — authenticated users can save and revisit neighbourhoods
 - **Recommendation history** — saved sessions viewable any time after sign-in
