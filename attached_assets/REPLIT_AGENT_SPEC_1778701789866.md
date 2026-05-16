@@ -1070,7 +1070,6 @@ async function generateNeighborhoodSummary(
 
 Create `.env` file:
 ```
-VITE_MAPBOX_TOKEN=pk.eyJ1IjoieW91ci11c2VybmFtZSIsImEiOiJjbGhqNXNsZGswMTBl...
 ```
 
 **Security**:
