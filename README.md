@@ -6,6 +6,23 @@ NeighbourFit AI is a full-stack lifestyle matching web app that helps people dis
 
 ---
 
+## About This Project
+
+NeighbourFit AI was developed as part of the **ENTI 333/633 Block Week course** at the **University of Calgary**, Haskayne School of Business. The project was built over a concentrated block week sprint, combining entrepreneurial thinking with full-stack software development to produce a working, deployable product.
+
+### Team
+
+| Name | Stream |
+|---|---|
+| Simrat Dhillon | Graduate |
+| Iteoluwakisi Adejuwon | Graduate |
+| Rethika Rajeev | Graduate |
+| Mariesa Cummings | Graduate |
+| Gurjit Samra | Undergraduate |
+| Derrick Martin | Undergraduate |
+
+---
+
 ## Features
 
 - **8-step questionnaire** — monthly budget slider, 7 priority sliders, workplace location selector, and a review step
