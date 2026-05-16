@@ -8,7 +8,7 @@ NeighbourFit AI is a full-stack lifestyle matching web app that helps people dis
 
 ## Features
 
-- **4-step questionnaire** — monthly budget slider, 7 priority sliders, workplace location selector, and a review step
+- **8-step questionnaire** — monthly budget slider, 7 priority sliders, workplace location selector, and a review step
 - **Ranked results** — top 5 neighbourhood matches scored by weighted compatibility, with fit labels and affordability warnings
 - **AI lifestyle insights** — GPT-4o-mini narrative summaries per match, cached in PostgreSQL for 24 hours
 - **Neighbourhood browser** — searchable, filterable grid of all 10 Calgary communities
@@ -37,55 +37,9 @@ NeighbourFit AI is a full-stack lifestyle matching web app that helps people dis
 
 ---
 
-## Getting Started
+## Check it out here
 
-### Prerequisites
-
-- Node.js 24+
-- pnpm 9+
-- A PostgreSQL database
-- An OpenAI API key
-
-### Environment variables
-
-| Variable | Required | Description |
-|---|---|---|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `SESSION_SECRET` | Yes | Secret for express-session (any long random string) |
-| `OPENAI_API_KEY` | Yes | OpenAI API key for AI summaries |
-| `MAPBOX_ACCESS_TOKEN` | No | Only needed if enabling the map view |
-
-### Install dependencies
-
-```bash
-pnpm install
-```
-
-### Push the database schema
-
-```bash
-pnpm --filter @workspace/db run push
-```
-
-### Run in development
-
-Start the API server and the frontend in two separate terminals (or via Replit workflows):
-
-```bash
-# Terminal 1 — API (port 8080)
-pnpm --filter @workspace/api-server run dev
-
-# Terminal 2 — Frontend (port 20938)
-pnpm --filter @workspace/neighbourfit run dev
-```
-
-The frontend proxies `/api` requests to the API server automatically.
-
-### Regenerate API types after changing the spec
-
-```bash
-pnpm --filter @workspace/api-spec run codegen
-```
+https://neighbour-fit-ai.replit.app
 
 ---
 
@@ -170,19 +124,6 @@ The admin dashboard is then accessible at `/admin`.
 - **British spellings** are used throughout the UI (`neighbourhood`, not `neighborhood`).
 - `pnpm run dev` at the workspace root does **not** work — use the per-package commands above.
 - After editing the OpenAPI spec, always run codegen before touching any frontend or API route code.
-
----
-
-## Deployment
-
-The app is designed to run as two services behind a shared reverse proxy:
-
-| Service | Path prefix | Default port |
-|---|---|---|
-| React frontend | `/` | 20938 |
-| Express API | `/api` | 8080 |
-
-Both services read `PORT` from the environment. The proxy routes `/api/*` to the API server and everything else to the frontend.
 
 ---
 
